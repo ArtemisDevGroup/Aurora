@@ -3,7 +3,20 @@
 
 #include "Definitions.h"
 
+#define AuroraContextStart() DWORD dwKey = Aurora::GlobalExceptionContext::SetContext(__FUNCTION__)
+#define AuroraContextEnd() Aurora::GlobalExceptionContext::ResetContext(dwKey)
+
 namespace Aurora {
+	class AURORA_API GlobalExceptionContext {
+	public:
+		GlobalExceptionContext() = delete;
+		GlobalExceptionContext(const GlobalExceptionContext&) = delete;
+		~GlobalExceptionContext() = delete;
+
+		static DWORD SetContext(_In_z_ LPCSTR lpFunctionName);
+		static void ResetContext(_In_ DWORD dwKey);
+	};
+
 	class AURORA_API IException {
 		CHAR szMessage[MAX_MSG];
 		DWORD dwIdentifier;

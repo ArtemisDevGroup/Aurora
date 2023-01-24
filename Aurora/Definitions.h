@@ -52,7 +52,7 @@
 #endif // !MAX_PATH
 
 #ifndef MAX_NAME
-#define MAX_NAME 64
+#define MAX_NAME 128
 #endif // !MAX_NAME
 
 #ifndef MAX_MSG

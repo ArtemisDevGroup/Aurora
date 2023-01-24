@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Array.h" />
+    <ClInclude Include="ConstexprUtil.h" />
     <ClInclude Include="Definitions.h" />
     <ClInclude Include="Events.h" />
     <ClInclude Include="Exceptions.h" />
@@ -29,7 +30,9 @@
     <ClInclude Include="Thread.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Exceptions.cpp" />
     <ClCompile Include="Identification.cpp" />
+    <ClCompile Include="String.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

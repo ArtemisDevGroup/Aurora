@@ -22,9 +22,14 @@ namespace Aurora {
 
 		~String();
 
-		void Add(_In_ const String& str);
+		/// <summary>
+		/// Inserts the string at the index provided.
+		/// </summary>
+		/// <param name="str"></param>
+		/// <param name="nIndex"></param>
+		void Add(_In_ const String& str, _In_ INT nIndex = -1);
 
-		void Add(_In_ CHAR chElement, _In_ INT nIndex = -1);
+		void Add(_In_ CHAR cElement, _In_ INT nIndex = -1);
 		void Add(_In_ SHORT nElement, _In_ INT nIndex = -1);
 		void Add(_In_ INT nElement, _In_ INT nIndex = -1);
 		void Add(_In_ LONG nElement, _In_ INT nIndex = -1);
@@ -36,8 +41,8 @@ namespace Aurora {
 		void Add(_In_ ULONG uElement, _In_ INT nIndex = -1);
 		void Add(_In_ ULONGLONG uElement, _In_ INT nIndex = -1);
 
-		void Add(_In_ FLOAT fElement, _In_ INT nIndex = -1);
-		void Add(_In_ DOUBLE dElement, _In_ INT nIndex = -1);
+		void Add(_In_ float fElement, _In_ INT nIndex = -1);
+		void Add(_In_ double dElement, _In_ INT nIndex = -1);
 
 		void Add(_In_ bool bElement, _In_ INT nIndex = -1);
 		void Add(_In_ LPVOID lpPointer, _In_ INT nIndex = -1);
@@ -59,8 +64,8 @@ namespace Aurora {
 		INT FindFirst(_In_ ULONG uElement);
 		INT FindFirst(_In_ ULONGLONG uElement);
 
-		INT FindFirst(_In_ FLOAT fElement);
-		INT FindFirst(_In_ DOUBLE dElement);
+		INT FindFirst(_In_ float fElement);
+		INT FindFirst(_In_ double dElement);
 
 		INT FindFirst(_In_ bool bElement);
 		INT FindFirst(_In_ LPVOID lpPointer);
@@ -80,8 +85,8 @@ namespace Aurora {
 		List<INT> Find(_In_ ULONG uElement);
 		List<INT> Find(_In_ ULONGLONG uElement);
 
-		List<INT> Find(_In_ FLOAT fElement);
-		List<INT> Find(_In_ DOUBLE dElement);
+		List<INT> Find(_In_ float fElement);
+		List<INT> Find(_In_ double dElement);
 
 		List<INT> Find(_In_ bool bElement);
 		List<INT> Find(_In_ LPVOID lpPointer);
