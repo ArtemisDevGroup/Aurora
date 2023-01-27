@@ -5,16 +5,20 @@
 namespace Aurora {
 	CHAR g_szExceptionContext[MAX_NAME];
 	DWORD g_dwContextKey = AURORA_CONTEXT_KEY_INVALID;
-	bool bHasContext = FALSE;
+	bool g_bHasContext = false;
 
 	DWORD GlobalExceptionContext::SetContext(_In_z_ LPCSTR lpFunctionName) {
-		if (!bHasContext) {
+		if (!g_bHasContext) {
 			strcpy_s(g_szExceptionContext, lpFunctionName);
-			bHasContext = true;
+			g_bHasContext = true;
 			return g_dwContextKey++;
 		}
 		else return AURORA_CONTEXT_KEY_INVALID;
 	}
 
-	void GlobalExceptionContext::ResetContext(_In_ DWORD dwKey) { if (bHasContext && dwKey == g_dwContextKey) bHasContext = false; }
+	void GlobalExceptionContext::ResetContext(_In_ DWORD dwKey) { if (g_bHasContext && dwKey == g_dwContextKey) g_bHasContext = false; }
+
+	IException::IException(_In_z_ LPCSTR lpMessage, _In_ const Identifier& id) {
+
+	}
 }

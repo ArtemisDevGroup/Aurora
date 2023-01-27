@@ -2,6 +2,7 @@
 #define __AURORA_EXCEPTIONS_H__
 
 #include "Definitions.h"
+#include "Identification.h"
 
 #define AuroraContextStart() DWORD dwKey = Aurora::GlobalExceptionContext::SetContext(__FUNCTION__)
 #define AuroraContextEnd() Aurora::GlobalExceptionContext::ResetContext(dwKey)
@@ -19,10 +20,10 @@ namespace Aurora {
 
 	class AURORA_API IException {
 		CHAR szMessage[MAX_MSG];
-		DWORD dwIdentifier;
+		Identifier Id;
 
 	public:
-
+		IException(_In_z_ LPCSTR lpMessage, _In_ const Identifier& id);
 	};
 
 	template<class Derived>

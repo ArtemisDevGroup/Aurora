@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Array.h" />
-    <ClInclude Include="ConstexprUtil.h" />
     <ClInclude Include="Definitions.h" />
     <ClInclude Include="Events.h" />
     <ClInclude Include="Exceptions.h" />

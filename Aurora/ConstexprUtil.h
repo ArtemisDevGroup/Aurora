@@ -1,4 +1,0 @@
-#ifndef __AURORA_CONSTEXPR_UTIL_H__
-#define __AURORA_CONSTEXPR_UTIL_H__
-
-#endif // !__AURORA_CONSTEXPR_UTIL_H__
