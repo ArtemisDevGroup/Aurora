@@ -8,18 +8,18 @@
 
 namespace Aurora {
 	class ExitCode {
-		DWORD dwCode;
+		A_DWORD dwCode;
 	public:
-		constexpr ExitCode(_In_ DWORD dwExitCode) : dwCode(dwExitCode) {}
+		constexpr ExitCode(_In_ A_DWORD dwExitCode) : dwCode(dwExitCode) {}
 
-		static constexpr DWORD Success = 0;
-		static constexpr DWORD UnknownError = -1;
-		static constexpr DWORD Terminated = -2;
+		static constexpr A_DWORD Success = 0;
+		static constexpr A_DWORD UnknownError = -1;
+		static constexpr A_DWORD Terminated = -2;
 
-		constexpr operator DWORD() const { return dwCode; }
+		constexpr operator A_DWORD() const { return dwCode; }
 	};
 
-	enum class WaitResult { Succeeded = WAIT_OBJECT_0, Abandoned = WAIT_ABANDONED, TimedOut = WAIT_TIMEOUT };
+	enum class WaitResult : A_DWORD { Succeeded = WAIT_OBJECT_0, Abandoned = WAIT_ABANDONED, TimedOut = WAIT_TIMEOUT };
 
 	template<typename ArgumentType = void>
 	class Thread : public IDisposable {
@@ -34,7 +34,7 @@ namespace Aurora {
 			ArgumentType Args;
 		} ArgStruct;
 
-		static DWORD __stdcall StaticThread(_In_ StaticThreadArgs* pArgs) { return pArgs->lpfnThread(pArgs->Args); }
+		static A_DWORD __stdcall StaticThread(_In_ StaticThreadArgs* pArgs) { return pArgs->lpfnThread(pArgs->Args); }
 
 	public:
 		Thread(_In_ ThreadFunction lpfnThread, _In_ ArgumentType Args) : hThread(nullptr) {
@@ -42,7 +42,7 @@ namespace Aurora {
 			ArgStruct.Args = Args;
 		}
 
-		void Start() {
+		A_VOID Start() {
 			hThread = CreateThread(
 				nullptr,
 				0,
@@ -55,25 +55,25 @@ namespace Aurora {
 			if (!hThread) /* throw */;
 		}
 
-		WaitResult Wait(_In_ DWORD dwMilliseconds = INFINITE) const {
-			DWORD dwResult = WaitForSingleObject(hThread, dwMilliseconds);
+		WaitResult Wait(_In_ A_DWORD dwMilliseconds = INFINITE) const {
+			A_DWORD dwResult = WaitForSingleObject(hThread, dwMilliseconds);
 			if (dwResult == WAIT_FAILED) /* throw */;
 
 			return (WaitResult)dwResult;
 		}
 
 		ExitCode GetExitCode() const {
-			DWORD dwResult;
+			A_DWORD dwResult;
 			if (!GetExitCodeThread(hThread, &dwResult)) /* throw */;
 
 			return ExitCode(dwResult);
 		}
 
-		void Terminate() const {
+		A_VOID Terminate() const {
 			if (!TerminateThread(hThread, ExitCode::Terminated)) /* throw */;
 		}
 
-		void IDisposable::Clone(_Out_ void* pDestination) const {
+		A_VOID IDisposable::Clone(_Out_ void* pDestination) const {
 			Thread<ArgumentType>* pDst = (Thread<ArgumentType>*)pDestination;
 			pDst->ArgStruct = ArgStruct;
 
@@ -90,7 +90,7 @@ namespace Aurora {
 
 		Thread(const Thread<ArgumentType>& cpy) { cpy.Clone(this); }
 
-		void IDisposable::Release() {
+		A_VOID IDisposable::Release() {
 			if (hThread) {
 				CloseHandle(hThread);
 				hThread = nullptr;
@@ -109,12 +109,12 @@ namespace Aurora {
 		ThreadFunction lpfnThread;
 		HANDLE hThread;
 
-		static DWORD __stdcall StaticThread(_In_ ThreadFunction lpfnThread) { return lpfnThread(); }
+		static A_DWORD __stdcall StaticThread(_In_ ThreadFunction lpfnThread) { return lpfnThread(); }
 
 	public:
 		Thread(_In_ ThreadFunction lpfnThread) : lpfnThread(lpfnThread), hThread(nullptr) {}
 
-		void Start() {
+		A_VOID Start() {
 			hThread = CreateThread(
 				nullptr,
 				0,
@@ -127,25 +127,25 @@ namespace Aurora {
 			if (!hThread) /* throw */;
 		}
 
-		WaitResult Wait(_In_ DWORD dwMilliseconds = INFINITE) const {
-			DWORD dwResult = WaitForSingleObject(hThread, dwMilliseconds);
+		WaitResult Wait(_In_ A_DWORD dwMilliseconds = INFINITE) const {
+			A_DWORD dwResult = WaitForSingleObject(hThread, dwMilliseconds);
 			if (dwResult == WAIT_FAILED) /* throw */;
 
 			return (WaitResult)dwResult;
 		}
 
 		ExitCode GetExitCode() const {
-			DWORD dwResult;
+			A_DWORD dwResult;
 			if (!GetExitCodeThread(hThread, &dwResult)) /* throw */;
 
 			return ExitCode(dwResult);
 		}
 
-		void Terminate() const {
+		A_VOID Terminate() const {
 			if (!TerminateThread(hThread, ExitCode::Terminated)) /* throw */;
 		}
 
-		void IDisposable::Clone(_Out_ void* pDestination) const {
+		A_VOID IDisposable::Clone(_Out_ void* pDestination) const {
 			Thread<>* pDst = (Thread<>*)pDestination;
 			pDst->lpfnThread = lpfnThread;
 
@@ -162,7 +162,7 @@ namespace Aurora {
 
 		Thread(const Thread<>& cpy) { cpy.Clone(this); }
 
-		void IDisposable::Release() {
+		A_VOID IDisposable::Release() {
 			if (hThread) {
 				CloseHandle(hThread);
 				hThread = nullptr;

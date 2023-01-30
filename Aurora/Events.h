@@ -7,7 +7,7 @@ namespace Aurora {
 	template<class InstanceEventArgs>
 	class AURORA_API Event {
 	public:
-		typedef void(__cdecl* InstanceEventHandler)(_In_opt_ void* pSender, _In_opt_ const InstanceEventArgs* pArgs);
+		typedef A_VOID(__cdecl* InstanceEventHandler)(_In_opt_ A_LPVOID lpSender, _In_opt_ const InstanceEventArgs* pArgs);
 
 	private:
 		InstanceEventHandler lpszfnEventHandlers[MAX_INVOKE];
@@ -17,20 +17,20 @@ namespace Aurora {
 			for (int i = 0; i < MAX_INVOKE; i++) lpszfnEventHandlers[i] = nullptr;
 		}
 
-		constexpr void Invoke(_In_opt_ void* pSender, _In_opt_ const InstanceEventArgs* pArgs) const {
-			for (int i = 0; i < MAX_INVOKE; i++)
+		constexpr A_VOID Invoke(_In_opt_ A_LPVOID lpSender, _In_opt_ const InstanceEventArgs* pArgs) const {
+			for (A_I32 i = 0; i < MAX_INVOKE; i++)
 				if (lpszfnEventHandlers[i])
-					lpszfnEventHandlers[i](pSender, pArgs);
+					lpszfnEventHandlers[i](lpSender, pArgs);
 		}
 
-		constexpr void operator+=(_In_ InstanceEventHandler lpfnEventHandler) {
-			for (int i = 0; i < MAX_INVOKE; i++)
+		constexpr A_VOID operator+=(_In_ InstanceEventHandler lpfnEventHandler) {
+			for (A_I32 i = 0; i < MAX_INVOKE; i++)
 				if (!lpszfnEventHandlers[i])
 					lpszfnEventHandlers[i] = lpfnEventHandler;
 		}
 
-		constexpr void operator-=(_In_ InstanceEventHandler lpfnEventHandler) {
-			for (int i = 0; i < MAX_INVOKE; i++)
+		constexpr A_VOID operator-=(_In_ InstanceEventHandler lpfnEventHandler) {
+			for (A_I32 i = 0; i < MAX_INVOKE; i++)
 				if (lpszfnEventHandlers[i] == lpfnEventHandler)
 					lpszfnEventHandlers[i] = nullptr;
 		}

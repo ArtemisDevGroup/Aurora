@@ -3,8 +3,11 @@
 
 #include "Definitions.h"
 #include "Identification.h"
+#include "String.h"
 
-#define AuroraContextStart() DWORD dwKey = Aurora::GlobalExceptionContext::SetContext(__FUNCTION__)
+#include <string.h>
+
+#define AuroraContextStart() A_DWORD dwKey = Aurora::GlobalExceptionContext::SetContext(__FUNCTION__)
 #define AuroraContextEnd() Aurora::GlobalExceptionContext::ResetContext(dwKey)
 
 namespace Aurora {
@@ -14,26 +17,28 @@ namespace Aurora {
 		GlobalExceptionContext(const GlobalExceptionContext&) = delete;
 		~GlobalExceptionContext() = delete;
 
-		static DWORD SetContext(_In_z_ LPCSTR lpFunctionName);
-		static void ResetContext(_In_ DWORD dwKey);
+		static A_DWORD SetContext(_In_ const String& Context);
+		static A_VOID ResetContext(_In_ A_DWORD dwKey);
 	};
 
 	class AURORA_API IException {
-		CHAR szMessage[MAX_MSG];
+		String Message;
 		Identifier Id;
 
 	public:
-		IException(_In_z_ LPCSTR lpMessage, _In_ const Identifier& id);
+		IException(_In_ const String& Message, _In_ const Identifier& Id);
+
+		constexpr const String& GetMessage() const;
 	};
 
 	template<class Derived>
 	class AURORA_API IExceptionContext {
-		CHAR szFile[MAX_PATH];
-		CHAR szFunction[MAX_NAME];
-		INT nLine;
+		A_CHAR szFile[MAX_PATH];
+		A_CHAR szFunction[MAX_NAME];
+		A_I32 nLine;
 
 	public:
-		Derived WithContext(_In_z_ LPCSTR lpFunction, _In_z_ LPCSTR lpFile, _In_ INT nLine) {
+		Derived WithContext(_In_z_ A_LPCSTR lpFunction, _In_z_ A_LPCSTR lpFile, _In_ A_I32 nLine) {
 			strcpy_s(szFunction, lpFunction);
 			strcpy_s(szFile, lpFile);
 			this->nLine = nLine;
@@ -41,9 +46,9 @@ namespace Aurora {
 			return *(Derived*)this;
 		}
 
-		constexpr LPCSTR GetFunction() const { return szFunction; }
-		constexpr LPCSTR GetFile() const { return szFile; }
-		constexpr INT GetLine() const { return nLine; }
+		constexpr A_LPCSTR GetFunction() const { return szFunction; }
+		constexpr A_LPCSTR GetFile() const { return szFile; }
+		constexpr A_I32 GetLine() const { return nLine; }
 	};
 }
 

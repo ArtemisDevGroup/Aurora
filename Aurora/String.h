@@ -7,18 +7,18 @@
 
 namespace Aurora {
 	class AURORA_API String : public IDisposable {
-		LPSTR lpString;
-		DWORD dwLength;
+		A_LPSTR lpString;
+		A_DWORD dwLength;
 
 	public:
 		String();
-		String(_In_z_ LPCSTR lpString);
+		String(_In_z_ A_LPCSTR lpString);
 
-		virtual void IDisposable::Clone(_Out_ void* pDestination) const;
+		virtual A_VOID IDisposable::Clone(_Out_ A_LPVOID lpDestination) const;
 
 		String(const String& cpy);
 
-		virtual void IDisposable::Release();
+		virtual A_VOID IDisposable::Release();
 
 		~String();
 
@@ -27,77 +27,69 @@ namespace Aurora {
 		/// </summary>
 		/// <param name="str"></param>
 		/// <param name="nIndex"></param>
-		void Add(_In_ const String& str, _In_ INT nIndex = -1);
+		A_VOID Add(_In_ const String& str, _In_ A_I32 nIndex = -1);
 
-		void Add(_In_ CHAR cElement, _In_ INT nIndex = -1);
-		void Add(_In_ SHORT nElement, _In_ INT nIndex = -1);
-		void Add(_In_ INT nElement, _In_ INT nIndex = -1);
-		void Add(_In_ LONG nElement, _In_ INT nIndex = -1);
-		void Add(_In_ LONGLONG nElement, _In_ INT nIndex = -1);
+		A_VOID Add(_In_ A_I8 nElement, _In_ A_I32 nIndex = -1);
+		A_VOID Add(_In_ A_I16 nElement, _In_ A_I32 nIndex = -1);
+		A_VOID Add(_In_ A_I32 nElement, _In_ A_I32 nIndex = -1);
+		A_VOID Add(_In_ A_I64 nElement, _In_ A_I32 nIndex = -1);
 
-		void Add(_In_ BYTE uElement, _In_ INT nIndex = -1);
-		void Add(_In_ USHORT uElement, _In_ INT nIndex = -1);
-		void Add(_In_ UINT uElement, _In_ INT nIndex = -1);
-		void Add(_In_ ULONG uElement, _In_ INT nIndex = -1);
-		void Add(_In_ ULONGLONG uElement, _In_ INT nIndex = -1);
+		A_VOID Add(_In_ A_U8 uElement, _In_ A_I32 nIndex = -1);
+		A_VOID Add(_In_ A_U16 uElement, _In_ A_I32 nIndex = -1);
+		A_VOID Add(_In_ A_U32 uElement, _In_ A_I32 nIndex = -1);
+		A_VOID Add(_In_ A_U64 uElement, _In_ A_I32 nIndex = -1);
 
-		void Add(_In_ float fElement, _In_ INT nIndex = -1);
-		void Add(_In_ double dElement, _In_ INT nIndex = -1);
+		A_VOID Add(_In_ A_FL32 fElement, _In_ A_I32 nIndex = -1);
+		A_VOID Add(_In_ A_FL64 fElement, _In_ A_I32 nIndex = -1);
 
-		void Add(_In_ bool bElement, _In_ INT nIndex = -1);
-		void Add(_In_ LPVOID lpPointer, _In_ INT nIndex = -1);
-		void Add(_In_z_ LPCSTR lpString, _In_ INT nIndex = -1);
+		A_VOID Add(_In_ A_BOOL bElement, _In_ A_I32 nIndex = -1);
+		A_VOID Add(_In_ A_LPVOID lpPointer, _In_ A_I32 nIndex = -1);
+		A_VOID Add(_In_z_ A_LPCSTR lpString, _In_ A_I32 nIndex = -1);
 
-		void Remove(_In_ INT nCount = 1, _In_ INT nIndex = -1);
+		A_VOID Remove(_In_ A_I32 nCount = 1, _In_ A_I32 nIndex = -1);
 
-		INT FindFirst(_In_ const String& str);
+		A_I32 FindFirst(_In_ const String& str);
 
-		INT FindFirst(_In_ CHAR chElement);
-		INT FindFirst(_In_ SHORT nElement);
-		INT FindFirst(_In_ INT nElement);
-		INT FindFirst(_In_ LONG nElement);
-		INT FindFirst(_In_ LONGLONG nElement);
+		A_I32 FindFirst(_In_ A_I8 nElement);
+		A_I32 FindFirst(_In_ A_I16 nElement);
+		A_I32 FindFirst(_In_ A_I32 nElement);
+		A_I32 FindFirst(_In_ A_I64 nElement);
 
-		INT FindFirst(_In_ BYTE uElement);
-		INT FindFirst(_In_ USHORT uElement);
-		INT FindFirst(_In_ UINT uElement);
-		INT FindFirst(_In_ ULONG uElement);
-		INT FindFirst(_In_ ULONGLONG uElement);
+		A_I32 FindFirst(_In_ A_U8 uElement);
+		A_I32 FindFirst(_In_ A_U16 uElement);
+		A_I32 FindFirst(_In_ A_U32 uElement);
+		A_I32 FindFirst(_In_ A_U64 uElement);
 
-		INT FindFirst(_In_ float fElement);
-		INT FindFirst(_In_ double dElement);
+		A_I32 FindFirst(_In_ A_FL32 fElement);
+		A_I32 FindFirst(_In_ A_FL64 fElement);
 
-		INT FindFirst(_In_ bool bElement);
-		INT FindFirst(_In_ LPVOID lpPointer);
-		INT FindFirst(_In_z_ LPCSTR lpString);
+		A_I32 FindFirst(_In_ A_BOOL bElement);
+		A_I32 FindFirst(_In_ A_LPVOID lpPointer);
+		A_I32 FindFirst(_In_z_ A_LPCSTR lpString);
 
-		List<INT> Find(_In_ const String& str);
+		List<A_I32> Find(_In_ const String& str);
 
-		List<INT> Find(_In_ CHAR chElement);
-		List<INT> Find(_In_ SHORT nElement);
-		List<INT> Find(_In_ INT nElement);
-		List<INT> Find(_In_ LONG nElement);
-		List<INT> Find(_In_ LONGLONG nElement);
+		List<A_I32> Find(_In_ A_I8 nElement);
+		List<A_I32> Find(_In_ A_I16 nElement);
+		List<A_I32> Find(_In_ A_I32 nElement);
+		List<A_I32> Find(_In_ A_I64 nElement);
 
-		List<INT> Find(_In_ BYTE uElement);
-		List<INT> Find(_In_ USHORT uElement);
-		List<INT> Find(_In_ UINT uElement);
-		List<INT> Find(_In_ ULONG uElement);
-		List<INT> Find(_In_ ULONGLONG uElement);
+		List<A_I32> Find(_In_ A_U8 uElement);
+		List<A_I32> Find(_In_ A_U16 uElement);
+		List<A_I32> Find(_In_ A_U32 uElement);
+		List<A_I32> Find(_In_ A_U64 uElement);
 
-		List<INT> Find(_In_ float fElement);
-		List<INT> Find(_In_ double dElement);
+		List<A_I32> Find(_In_ A_FL32 fElement);
+		List<A_I32> Find(_In_ A_FL64 fElement);
 
-		List<INT> Find(_In_ bool bElement);
-		List<INT> Find(_In_ LPVOID lpPointer);
-		List<INT> Find(_In_z_ LPCSTR lpString);
-	};
+		List<A_I32> Find(_In_ A_BOOL bElement);
+		List<A_I32> Find(_In_ A_LPVOID lpPointer);
+		List<A_I32> Find(_In_z_ A_LPCSTR lpString);
 
-	class AURORA_API WString {
-		LPWSTR lpString;
-		DWORD dwLength;
+		constexpr operator A_LPCSTR() const { return lpString; }
 
-	public:
+		constexpr A_LPCSTR cstr() const { return lpString; }
+		constexpr A_DWORD size() const { return dwLength; }
 	};
 }
 

@@ -2,12 +2,13 @@
 #define __AURORA_IDENTIFICATION_H__
 
 #include "Definitions.h"
+#include "String.h"
 
 namespace Aurora {
 	struct AURORA_API IdentityDescriptor {
-		DWORD dwIdentifier;
-		CHAR szTypeName[MAX_NAME];
-		DWORD dwObjectSize;
+		A_DWORD dwIdentifier;
+		String TypeName;
+		A_DWORD dwObjectSize;
 	};
 
 	class AURORA_API Identifier {
@@ -19,13 +20,13 @@ namespace Aurora {
 	public:
 		constexpr Identifier();
 
-		static constexpr Identifier Create(_In_z_ LPCSTR lpTypeName, _In_ DWORD dwObjectSize);
-		static constexpr Identifier CreateUnique(_In_z_ LPCSTR lpTypeName, _In_ DWORD dwObjectSize);
+		static constexpr Identifier Create(_In_ const String& TypeName, _In_ A_DWORD dwObjectSize);
+		static constexpr Identifier CreateUnique(_In_ const String& TypeName, _In_ A_DWORD dwObjectSize);
 
 		constexpr const IdentityDescriptor* GetDesc() const;
 
-		constexpr bool operator==(const Identifier&);
-		constexpr bool operator!=(const Identifier&);
+		constexpr A_BOOL operator==(const Identifier&);
+		constexpr A_BOOL operator!=(const Identifier&);
 	};
 }
 

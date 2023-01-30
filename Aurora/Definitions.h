@@ -55,6 +55,13 @@
 #define MAX_INVOKE 64
 #endif // !MAX_INVOKE
 
+#define A_VOID void
+
+// A void pointer. Generally used as an out pointer of a generic type. Is prefixed as 'lp'.
+typedef A_VOID* A_LPVOID;
+// A constant void pointer. Generally used as an in pointer of a generic type. Is prefixed as 'lp'.
+typedef const A_VOID* A_LPCVOID;
+
 // An ANSI character, prefixed as 'c'.
 typedef char A_CHAR;
 // An ANSI character pointer, prefixed as 'lp'.
@@ -72,11 +79,6 @@ typedef wchar_t* A_LPWCHAR;
 typedef wchar_t* A_LPWSTR;
 // A UTF-16LE character pointer. Used for wide strings and is prefixed as 'lp'.
 typedef const wchar_t* A_LPCWSTR;
-
-// A void pointer. Generally used as an out pointer of a generic type. Is prefixed as 'lp'.
-typedef void* A_LPVOID;
-// A constant void pointer. Generally used as an in pointer of a generic type. Is prefixed as 'lp'.
-typedef const void* A_LPCVOID;
 
 // A boolean, prefixed as 'b'.
 typedef bool A_BOOL;
@@ -139,19 +141,31 @@ typedef const A_U32* A_LPCU32;
 // A constant 64-bit unsigned integer pointer, prefixed as 'lp'.
 typedef const A_U64* A_LPCU64;
 
+// An 8-bit unsigned integer, prefixed as 'u'.
 typedef unsigned char A_BYTE;
+// A 16-bit unsigned integer, prefixed as 'w'.
 typedef unsigned short A_WORD;
+// A 32-bit unsigned integer, prefixed as 'dw'.
 typedef unsigned long A_DWORD;
+// A 64-bit unsigned integer, prefixed as 'qw'.
 typedef unsigned long long A_QWORD;
 
+// An 8-bit unsigned integer pointer, prefixed as 'lp'.
 typedef A_BYTE* A_LPBYTE;
+// A 16-bit unsigned integer pointer, prefixed as 'lp'.
 typedef A_WORD* A_LPWORD;
+// A 32-bit unsigned integer pointer, prefixed as 'lp'.
 typedef A_DWORD* A_LPDWORD;
+// A 64-bit unsigned integer pointer, prefixed as 'lp'.
 typedef A_QWORD* A_LPQWORD;
 
+// A constant 8-bit unsigned integer pointer, prefixed as 'lp'.
 typedef const A_BYTE* A_LPCBYTE;
+// A constant 16-bit unsigned integer pointer, prefixed as 'lp'.
 typedef const A_WORD* A_LPCWORD;
+// A constant 32-bit unsigned integer pointer, prefixed as 'lp'.
 typedef const A_DWORD* A_LPCDWORD;
+// A constant 64-bit unsigned integer pointer, prefixed as 'lp'.
 typedef const A_QWORD* A_LPCQWORD;
 
 // A 32-bit floating point, prefixed as 'f'.
