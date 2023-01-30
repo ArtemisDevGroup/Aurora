@@ -26,20 +26,6 @@
 
 #endif // !_AURORA_EXCLUDE_SAL
 
-#ifndef _AURORA_EXCLUDE_WINDEFS
-
-#if defined(_M_IX86)
-#define _X86_
-#elif defined(_M_AMD64)
-#define _AMD64_
-#else
-#error No target architecture!
-#endif
-
-#include <minwindef.h>
-
-#endif // !AURORA_EXCLUDE_WINDEFS
-
 #define AURORA_EXPORT __declspec(dllexport)
 #define AURORA_IMPORT __declspec(dllimport)
 
@@ -50,45 +36,137 @@
 #endif
 
 #ifndef MAX_PATH
+// The maximum number of characters in a valid file path.
 #define MAX_PATH 260
 #endif // !MAX_PATH
 
 #ifndef MAX_NAME
+// The maximum number of characters in a name.
 #define MAX_NAME 128
 #endif // !MAX_NAME
 
 #ifndef MAX_MSG
+// The maximum number of characers in a message.
 #define MAX_MSG 256
 #endif // !MAX_MSG
 
 #ifndef MAX_INVOKE
+// The maximum number of invokable objects registered per instance.
 #define MAX_INVOKE 64
 #endif // !MAX_INVOKE
 
+// An ANSI character, prefixed as 'c'.
 typedef char A_CHAR;
+// An ANSI character pointer, prefixed as 'lp'.
 typedef char* A_LPCHAR;
+// An ANSI character pointer. Used for string buffers and is prefixed as 'lp'.
 typedef char* A_LPSTR;
+// A constant ANSI character pointer. Used for strings and is prefixed as 'lp'.
 typedef const char* A_LPCSTR;
 
+// A UTF-16LE character, prefixed as 'wc'.
 typedef wchar_t A_WCHAR;
+// A UTF-16LE character pointer, prefixed as 'lp'.
 typedef wchar_t* A_LPWCHAR;
+// A UTF-16LE character pointer. Used for wide string buffers and is prefixed as 'lp'.
 typedef wchar_t* A_LPWSTR;
+// A UTF-16LE character pointer. Used for wide strings and is prefixed as 'lp'.
 typedef const wchar_t* A_LPCWSTR;
 
+// A void pointer. Generally used as an out pointer of a generic type. Is prefixed as 'lp'.
 typedef void* A_LPVOID;
+// A constant void pointer. Generally used as an in pointer of a generic type. Is prefixed as 'lp'.
 typedef const void* A_LPCVOID;
 
+// A boolean, prefixed as 'b'.
 typedef bool A_BOOL;
+// A boolean pointer, prefixed as 'lp'.
 typedef bool* A_LPBOOL;
+// A constant boolean pointer, prefixed as 'lp'.
+typedef const bool* A_LPCBOOL;
 
+// An 8-bit signed integer, prefixed as 'n'.
 typedef signed __int8 A_I8;
+// A 16-bit signed integer, prefixed as 'n'.
 typedef signed __int16 A_I16;
+// A 32-bit signed integer, prefixed as 'n'.
 typedef signed __int32 A_I32;
+// A 64-bit signed integer, prefixed as 'n'.
 typedef signed __int64 A_I64;
 
+// An 8-bit signed integer pointer, prefixed as 'lp'.
+typedef A_I8* A_LPI8;
+// A 16-bit signed integer pointer, prefixed as 'lp'.
+typedef A_I16* A_LPI16;
+// A 32-bit signed integer pointer, prefixed as 'lp'.
+typedef A_I32* A_LPI32;
+// A 64-bit signed integer pointer, prefixed as 'lp'.
+typedef A_I64* A_LPI64;
+
+// A constant 8-bit signed integer pointer, prefixed as 'lp'.
+typedef const A_I8* A_LPCI8;
+// A constant 16-bit signed integer pointer, prefixed as 'lp'.
+typedef const A_I16* A_LPCI16;
+// A constant 32-bit signed integer pointer, prefixed as 'lp'.
+typedef const A_I32* A_LPCI32;
+// A constant 64-bit signed integer pointer, prefixed as 'lp'.
+typedef const A_I64* A_LPCI64;
+
+// An 8-bit unsigned integer, prefixed as 'u'.
 typedef unsigned __int8 A_U8;
+// A 16-bit unsigned integer, prefixed as 'u'.
 typedef unsigned __int16 A_U16;
+// A 32-bit unsigned integer, prefixed as 'u'.
 typedef unsigned __int32 A_U32;
+// A 64-bit unsigned integer, prefixed as 'u'.
 typedef unsigned __int64 A_U64;
+
+// An 8-bit unsigned integer pointer, prefixed as 'lp'.
+typedef A_U8* A_LPU8;
+// A 16-bit unsigned integer pointer, prefixed as 'lp'.
+typedef A_U16* A_LPU16;
+// A 32-bit unsigned integer pointer, prefixed as 'lp'.
+typedef A_U32* A_LPU32;
+// A 64-bit unsigned integer pointer, prefixed as 'lp'.
+typedef A_U64* A_LPU64;
+
+// A constant 8-bit unsigned integer pointer, prefixed as 'lp'.
+typedef const A_U8* A_LPCU8;
+// A constant 16-bit unsigned integer pointer, prefixed as 'lp'.
+typedef const A_U16* A_LPCU16;
+// A constant 32-bit unsigned integer pointer, prefixed as 'lp'.
+typedef const A_U32* A_LPCU32;
+// A constant 64-bit unsigned integer pointer, prefixed as 'lp'.
+typedef const A_U64* A_LPCU64;
+
+typedef unsigned char A_BYTE;
+typedef unsigned short A_WORD;
+typedef unsigned long A_DWORD;
+typedef unsigned long long A_QWORD;
+
+typedef A_BYTE* A_LPBYTE;
+typedef A_WORD* A_LPWORD;
+typedef A_DWORD* A_LPDWORD;
+typedef A_QWORD* A_LPQWORD;
+
+typedef const A_BYTE* A_LPCBYTE;
+typedef const A_WORD* A_LPCWORD;
+typedef const A_DWORD* A_LPCDWORD;
+typedef const A_QWORD* A_LPCQWORD;
+
+// A 32-bit floating point, prefixed as 'f'.
+typedef float A_FL32;
+// A 64-bit floating point, prefixed as 'f'.
+typedef double A_FL64;
+
+// A 32-bit floating point pointer, prefixed as 'lp'.
+typedef A_FL32* A_LPFL32;
+// A 64-bit floating point pointer, prefixed as 'lp'.
+typedef A_FL64* A_LPFL64;
+
+// A constant 32-bit floating point pointer, prefixed as 'lp'.
+typedef const A_FL32* A_LPCFL32;
+// A constant 64-bit floating point pointer, prefixed as 'lp'.
+typedef const A_FL64* A_LPCFL64;
 
 #endif // !__AURORA_DEFINITIONS_H__
