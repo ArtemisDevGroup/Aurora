@@ -22,23 +22,25 @@ namespace Aurora {
 		return ret;
 	}
 
+#pragma intrinsic(_rotl)
+
 	DWORD g_dwGlobalRotl = 16;
 	DWORD g_szdwRegisteredList[256];
 	DWORD g_dwListIndex = 0;
 
-	void Identifier::IdHelper_AddToList(_In_ const Identifier& id) {
+	constexpr void Identifier::IdHelper_AddToList(_In_ const Identifier& id) {
 		g_szdwRegisteredList[g_dwListIndex] = id.desc.dwIdentifier;
 		if (g_dwListIndex++ == 256) g_dwListIndex = 0;
 	}
 
-	bool Identifier::IdHelper_IsUnique(_In_ const Identifier& id) {
+	constexpr bool Identifier::IdHelper_IsUnique(_In_ const Identifier& id) {
 		for (int i = 0; i < 256; i++)
 			if (g_szdwRegisteredList[i] == id.desc.dwIdentifier)
 				return false;
 		return true;
 	}
 
-	void Identifier::IdHelper_Rotl(_Inout_ Identifier& id) {
+	constexpr void Identifier::IdHelper_Rotl(_Inout_ Identifier& id) {
 		id.desc.dwIdentifier = _rotl(id.desc.dwIdentifier, g_dwGlobalRotl);
 		g_dwGlobalRotl += id.desc.dwObjectSize;
 	}

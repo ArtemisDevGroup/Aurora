@@ -18,7 +18,5 @@ namespace Aurora {
 
 	void GlobalExceptionContext::ResetContext(_In_ DWORD dwKey) { if (g_bHasContext && dwKey == g_dwContextKey) g_bHasContext = false; }
 
-	IException::IException(_In_z_ LPCSTR lpMessage, _In_ const Identifier& id) {
-
-	}
+	IException::IException(_In_z_ LPCSTR lpMessage, _In_ const Identifier& id) : Id(id) { strcpy_s(szMessage, lpMessage); }
 }

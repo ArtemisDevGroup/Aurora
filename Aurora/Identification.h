@@ -13,9 +13,9 @@ namespace Aurora {
 	class AURORA_API Identifier {
 		IdentityDescriptor desc;
 
-		static void IdHelper_AddToList(_In_ const Identifier& id);
-		static bool IdHelper_IsUnique(_In_ const Identifier& id);
-		static void IdHelper_Rotl(_Inout_ Identifier& id);
+		static constexpr void IdHelper_AddToList(_In_ const Identifier& id);
+		static constexpr bool IdHelper_IsUnique(_In_ const Identifier& id);
+		static constexpr void IdHelper_Rotl(_Inout_ Identifier& id);
 	public:
 		constexpr Identifier();
 

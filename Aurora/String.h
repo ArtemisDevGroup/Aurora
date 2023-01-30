@@ -14,7 +14,7 @@ namespace Aurora {
 		String();
 		String(_In_z_ LPCSTR lpString);
 
-		virtual void IDisposable::Clone(void* pDestination) const;
+		virtual void IDisposable::Clone(_Out_ void* pDestination) const;
 
 		String(const String& cpy);
 

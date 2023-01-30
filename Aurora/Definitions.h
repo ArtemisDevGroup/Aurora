@@ -1,14 +1,6 @@
 #ifndef __AURORA_DEFINITIONS_H__
 #define __AURORA_DEFINITIONS_H__
 
-#if defined(_M_IX86)
-#define _X86_
-#elif defined(_M_AMD64)
-#define _AMD64_
-#else
-#error No target architecture!
-#endif
-
 #ifndef _AURORA_EXCLUDE_SAL
 #include <sal.h>
 #else
@@ -35,7 +27,17 @@
 #endif // !_AURORA_EXCLUDE_SAL
 
 #ifndef _AURORA_EXCLUDE_WINDEFS
+
+#if defined(_M_IX86)
+#define _X86_
+#elif defined(_M_AMD64)
+#define _AMD64_
+#else
+#error No target architecture!
+#endif
+
 #include <minwindef.h>
+
 #endif // !AURORA_EXCLUDE_WINDEFS
 
 #define AURORA_EXPORT __declspec(dllexport)
@@ -62,5 +64,31 @@
 #ifndef MAX_INVOKE
 #define MAX_INVOKE 64
 #endif // !MAX_INVOKE
+
+typedef char A_CHAR;
+typedef char* A_LPCHAR;
+typedef char* A_LPSTR;
+typedef const char* A_LPCSTR;
+
+typedef wchar_t A_WCHAR;
+typedef wchar_t* A_LPWCHAR;
+typedef wchar_t* A_LPWSTR;
+typedef const wchar_t* A_LPCWSTR;
+
+typedef void* A_LPVOID;
+typedef const void* A_LPCVOID;
+
+typedef bool A_BOOL;
+typedef bool* A_LPBOOL;
+
+typedef signed __int8 A_I8;
+typedef signed __int16 A_I16;
+typedef signed __int32 A_I32;
+typedef signed __int64 A_I64;
+
+typedef unsigned __int8 A_U8;
+typedef unsigned __int16 A_U16;
+typedef unsigned __int32 A_U32;
+typedef unsigned __int64 A_U64;
 
 #endif // !__AURORA_DEFINITIONS_H__

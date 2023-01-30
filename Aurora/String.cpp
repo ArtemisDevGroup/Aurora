@@ -1,5 +1,7 @@
 #include "String.h"
 
+#include <stdio.h>
+
 namespace Aurora {
 	String::String() : lpString(nullptr), dwLength(0) {}
 
@@ -30,7 +32,84 @@ namespace Aurora {
 
 	void String::Add(_In_ const String& str, _In_ INT nIndex = -1) { Add(str.lpString, nIndex); }
 
+	void String::Add(_In_ CHAR cElement, _In_ INT nIndex = -1) {
+		CHAR szString[2] = { cElement, '\0' };
+		Add(szString, nIndex);
+	}
 
+	void String::Add(_In_ SHORT nElement, _In_ INT nIndex = -1) {
+		CHAR szString[64];
+		sprintf_s(szString, "%hi", nElement);
+		Add(szString, nIndex);
+	}
+
+	void String::Add(_In_ INT nElement, _In_ INT nIndex = -1) {
+		CHAR szString[64];
+		sprintf_s(szString, "%i", nElement);
+		Add(szString, nIndex);
+	}
+
+	void String::Add(_In_ LONG nElement, _In_ INT nIndex = -1) {
+		CHAR szString[64];
+		sprintf_s(szString, "%li", nElement);
+		Add(szString, nIndex);
+	}
+
+	void String::Add(_In_ LONGLONG nElement, _In_ INT nIndex = -1) {
+		CHAR szString[64];
+		sprintf_s(szString, "%lli", nElement);
+		Add(szString, nIndex);
+	}
+
+	void String::Add(_In_ BYTE uElement, _In_ INT nIndex = -1) {
+		CHAR szString[64];
+		sprintf_s(szString, "%hhui", uElement);
+		Add(szString, nIndex);
+	}
+
+	void String::Add(_In_ USHORT uElement, _In_ INT nIndex = -1) {
+		CHAR szString[64];
+		sprintf_s(szString, "%hu", uElement);
+		Add(szString, nIndex);
+	}
+
+	void String::Add(_In_ UINT uElement, _In_ INT nIndex = -1) {
+		CHAR szString[64];
+		sprintf_s(szString, "%u", uElement);
+		Add(szString, nIndex);
+	}
+
+	void String::Add(_In_ ULONG uElement, _In_ INT nIndex = -1) {
+		CHAR szString[64];
+		sprintf_s(szString, "%lu", uElement);
+		Add(szString, nIndex);
+	}
+
+	void String::Add(_In_ ULONGLONG uElement, _In_ INT nIndex = -1) {
+		CHAR szString[64];
+		sprintf_s(szString, "%llu", uElement);
+		Add(szString, nIndex);
+	}
+
+	void String::Add(_In_ float fElement, _In_ INT nIndex = -1) {
+		CHAR szString[64];
+		sprintf_s(szString, "%f", fElement);
+		Add(szString, nIndex);
+	}
+
+	void String::Add(_In_ double dElement, _In_ INT nIndex = -1) {
+		CHAR szString[64];
+		sprintf_s(szString, "%f", dElement);
+		Add(szString, nIndex);
+	}
+
+	void String::Add(_In_ bool bElement, _In_ INT nIndex = -1) {
+
+	}
+
+	void String::Add(_In_ LPVOID lpPointer, _In_ INT nIndex = -1) {
+
+	}
 
 	void String::Add(_In_z_ LPCSTR lpString, _In_ INT nIndex = -1) {
 		if (nIndex >= dwLength) /* throw */;
