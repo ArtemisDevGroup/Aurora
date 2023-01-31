@@ -174,7 +174,53 @@ namespace Aurora {
 		FindFirst(szString);
 	}
 
+	A_I32 String::FindFirst(_In_ A_U8 uElement) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%hhu", uElement);
+		FindFirst(szString);
+	}
 
+	A_I32 String::FindFirst(_In_ A_U16 uElement) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%hu", uElement);
+		FindFirst(szString);
+	}
+
+	A_I32 String::FindFirst(_In_ A_U32 uElement) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%u", uElement);
+		FindFirst(szString);
+	}
+
+	A_I32 String::FindFirst(_In_ A_U64 uElement) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%llu", uElement);
+		FindFirst(szString);
+	}
+
+	A_I32 String::FindFirst(_In_ A_FL32 fElement) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%f", fElement);
+		FindFirst(szString);
+	}
+
+	A_I32 String::FindFirst(_In_ A_FL64 fElement) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%f", fElement);
+		FindFirst(szString);
+	}
+
+	A_I32 String::FindFirst(_In_ A_BOOL bElement) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%s", bElement ? "true" : "false");
+		FindFirst(szString);
+	}
+
+	A_I32 String::FindFirst(_In_ A_LPVOID lpPointer) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%p", lpPointer);
+		FindFirst(szString);
+	}
 
 	A_I32 String::FindFirst(_In_z_ A_LPCSTR lpString) const {
 		A_BOOL bFound = true;
@@ -191,6 +237,82 @@ namespace Aurora {
 
 			if (bFound) return i;
 		}
+	}
+
+	List<A_I32> String::Find(_In_ const String& str) const {
+		return Find(str.cstr());
+	}
+
+	List<A_I32> String::Find(_In_ A_I8 nElement) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%hhi", nElement);
+		Find(szString);
+	}
+
+	List<A_I32> String::Find(_In_ A_I16 nElement) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%hi", nElement);
+		Find(szString);
+	}
+
+	List<A_I32> String::Find(_In_ A_I32 nElement) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%i", nElement);
+		Find(szString);
+	}
+
+	List<A_I32> String::Find(_In_ A_I64 nElement) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%lli", nElement);
+		Find(szString);
+	}
+
+	List<A_I32> String::Find(_In_ A_U8 uElement) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%hhu", uElement);
+		Find(szString);
+	}
+
+	List<A_I32> String::Find(_In_ A_U16 uElement) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%hu", uElement);
+		Find(szString);
+	}
+
+	List<A_I32> String::Find(_In_ A_U32 uElement) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%u", uElement);
+		Find(szString);
+	}
+
+	List<A_I32> String::Find(_In_ A_U64 uElement) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%llu", uElement);
+		Find(szString);
+	}
+
+	List<A_I32> String::Find(_In_ A_FL32 fElement) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%f", fElement);
+		Find(szString);
+	}
+
+	List<A_I32> String::Find(_In_ A_FL64 fElement) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%f", fElement);
+		Find(szString);
+	}
+
+	List<A_I32> String::Find(_In_ A_BOOL bElement) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%s", bElement ? "true" : "false");
+		Find(szString);
+	}
+
+	List<A_I32> String::Find(_In_ A_LPVOID lpPointer) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%p", lpPointer);
+		Find(szString);
 	}
 
 	List<A_I32> String::Find(_In_z_ A_LPCSTR lpString) const {
