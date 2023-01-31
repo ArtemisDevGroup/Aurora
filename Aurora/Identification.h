@@ -14,9 +14,9 @@ namespace Aurora {
 	class AURORA_API Identifier {
 		IdentityDescriptor desc;
 
-		static constexpr void IdHelper_AddToList(_In_ const Identifier& id);
-		static constexpr bool IdHelper_IsUnique(_In_ const Identifier& id);
-		static constexpr void IdHelper_Rotl(_Inout_ Identifier& id);
+		static constexpr A_VOID IdHelper_AddToList(_In_ const Identifier& id);
+		static constexpr A_BOOL IdHelper_IsUnique(_In_ const Identifier& id);
+		static constexpr A_VOID IdHelper_Rotl(_Inout_ Identifier& id);
 	public:
 		constexpr Identifier();
 
@@ -25,8 +25,8 @@ namespace Aurora {
 
 		constexpr const IdentityDescriptor* GetDesc() const;
 
-		constexpr A_BOOL operator==(const Identifier&);
-		constexpr A_BOOL operator!=(const Identifier&);
+		constexpr A_BOOL operator==(const Identifier&) const;
+		constexpr A_BOOL operator!=(const Identifier&) const;
 	};
 }
 

@@ -130,4 +130,107 @@ namespace Aurora {
 		delete[] lpOld;
 		dwLength = dwNewLength;
 	}
+
+	A_VOID String::Remove(_In_ A_I32 nCount, _In_ A_I32 nIndex) {
+		if (nIndex + nCount >= dwLength) /* throw */;
+
+		if (nIndex == -1) {
+			dwLength -= nCount;
+			lpString[dwLength] = '\0';
+		}
+		else {
+			for (A_I32 i = 0; i < dwLength - nIndex - nCount; i++)
+				lpString[nIndex + i] = lpString[nIndex + nCount + i];
+			dwLength -= nCount;
+			lpString[dwLength] = '\0';
+		}
+	}
+
+	A_I32 String::FindFirst(_In_ const String& str) const {
+		return FindFirst(str.cstr());
+	}
+
+	A_I32 String::FindFirst(_In_ A_I8 nElement) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%hhi", nElement);
+		FindFirst(szString);
+	}
+
+	A_I32 String::FindFirst(_In_ A_I16 nElement) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%hi", nElement);
+		FindFirst(szString);
+	}
+
+	A_I32 String::FindFirst(_In_ A_I32 nElement) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%i", nElement);
+		FindFirst(szString);
+	}
+
+	A_I32 String::FindFirst(_In_ A_I64 nElement) const {
+		A_CHAR szString[64];
+		sprintf_s(szString, "%lli", nElement);
+		FindFirst(szString);
+	}
+
+
+
+	A_I32 String::FindFirst(_In_z_ A_LPCSTR lpString) const {
+		A_BOOL bFound = true;
+
+		for (A_I32 i = 0; i < dwLength; i++) {
+			bFound = true;
+
+			for (A_I32 j = 0; j < strlen(lpString); j++) {
+				if (this->lpString[i + j] != lpString[j]) {
+					bFound = false;
+					break;
+				}
+			}
+
+			if (bFound) return i;
+		}
+	}
+
+	List<A_I32> String::Find(_In_z_ A_LPCSTR lpString) const {
+		List<A_I32> indexList;
+		A_BOOL bFound = true;
+
+		for (A_I32 i = 0; i < dwLength; i++) {
+			bFound = true;
+
+			for (A_I32 j = 0; j < strlen(lpString); j++) {
+				if (this->lpString[i + j] != lpString[j]) {
+					bFound = false;
+					break;
+				}
+			}
+
+			if (bFound) indexList.Add(i);
+		}
+
+		return indexList;
+	}
+
+	constexpr String::operator A_LPCSTR() const { return lpString; }
+
+	constexpr A_LPCSTR String::cstr() const { return lpString; }
+	constexpr A_DWORD String::size() const { return dwLength; }
+
+	constexpr A_BOOL String::operator==(const String& operand) const {
+		return !strcmp(lpString, operand.lpString);
+	}
+
+	constexpr A_BOOL String::operator!=(const String& operand) const {
+		return !strcmp(lpString, operand.lpString);
+	}
+
+	constexpr String String::operator+(const String& operand) const {
+		String ret = *this;
+		ret.Add(operand);
+		return ret;
+	}
+
+	constexpr A_VOID String::operator+=(const String& operand) { this->Add(operand); }
 }

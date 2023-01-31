@@ -53,11 +53,11 @@ namespace Aurora {
 
 	constexpr const IdentityDescriptor* Identifier::GetDesc() const { return &desc; }
 
-	constexpr A_BOOL Identifier::operator==(const Identifier& operand) {
+	constexpr A_BOOL Identifier::operator==(const Identifier& operand) const {
 		return desc.dwIdentifier == operand.desc.dwIdentifier;
 	}
 
-	constexpr A_BOOL Identifier::operator!=(const Identifier& operand) {
+	constexpr A_BOOL Identifier::operator!=(const Identifier& operand) const {
 		return desc.dwIdentifier != operand.desc.dwIdentifier;
 	}
 }

@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="Array.h" />
     <ClInclude Include="Definitions.h" />
+    <ClInclude Include="Enumerations.h" />
     <ClInclude Include="Events.h" />
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="Identification.h" />

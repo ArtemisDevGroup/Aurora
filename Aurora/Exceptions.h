@@ -29,6 +29,15 @@ namespace Aurora {
 		IException(_In_ const String& Message, _In_ const Identifier& Id);
 
 		constexpr const String& GetMessage() const;
+		constexpr const Identifier& GetIdentifier() const;
+
+		constexpr A_BOOL operator==(const IException&) const;
+		constexpr A_BOOL operator==(const Identifier&) const;
+		constexpr A_BOOL operator==(const String&) const;
+
+		constexpr A_BOOL operator!=(const IException&) const;
+		constexpr A_BOOL operator!=(const Identifier&) const;
+		constexpr A_BOOL operator!=(const String&) const;
 	};
 
 	template<class Derived>

@@ -5,31 +5,10 @@
 #include <stdlib.h>
 
 #include "Definitions.h"
+#include "Enumerations.h"
 #include "Interfaces.h"
 
 namespace Aurora {
-	/// <summary>
-	/// <para>Represents a result after the comparison of two values.</para>
-	/// <para>This is used as a return value for the compare routine of the collection classes.</para>
-	/// <para>See guides or the API reference for usage examples.</para>
-	/// </summary>
-	enum class CompareResult : A_I32 {
-		/// <summary>
-		/// Element 1 is less than element 2.
-		/// </summary>
-		LessThan = -1,
-
-		/// <summary>
-		/// Element 1 and element 2 are equal.
-		/// </summary>
-		Equal = 0,
-
-		/// <summary>
-		/// Element 1 is more than element 2.
-		/// </summary>
-		MoreThan = 1
-	};
-
 	/// <summary>
 	/// A class for storing sequences of data.
 	/// </summary>
@@ -247,6 +226,10 @@ namespace Aurora {
 				Move(nIndex + nCount, nIndex);
 				this->nCount -= nCount;
 			}
+		}
+
+		inline A_VOID Concatenate(_In_ const List<ElementType>& other) {
+			Add(other.begin(), other.size(), -1);
 		}
 
 		typedef CompareResult(__cdecl* CompareFunction)(const ElementType* pElement1, const ElementType* pElement2);

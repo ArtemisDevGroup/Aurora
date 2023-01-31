@@ -48,48 +48,53 @@ namespace Aurora {
 
 		A_VOID Remove(_In_ A_I32 nCount = 1, _In_ A_I32 nIndex = -1);
 
-		A_I32 FindFirst(_In_ const String& str);
+		A_I32 FindFirst(_In_ const String& str) const;
 
-		A_I32 FindFirst(_In_ A_I8 nElement);
-		A_I32 FindFirst(_In_ A_I16 nElement);
-		A_I32 FindFirst(_In_ A_I32 nElement);
-		A_I32 FindFirst(_In_ A_I64 nElement);
+		A_I32 FindFirst(_In_ A_I8 nElement) const;
+		A_I32 FindFirst(_In_ A_I16 nElement) const;
+		A_I32 FindFirst(_In_ A_I32 nElement) const;
+		A_I32 FindFirst(_In_ A_I64 nElement) const;
 
-		A_I32 FindFirst(_In_ A_U8 uElement);
-		A_I32 FindFirst(_In_ A_U16 uElement);
-		A_I32 FindFirst(_In_ A_U32 uElement);
-		A_I32 FindFirst(_In_ A_U64 uElement);
+		A_I32 FindFirst(_In_ A_U8 uElement) const;
+		A_I32 FindFirst(_In_ A_U16 uElement) const;
+		A_I32 FindFirst(_In_ A_U32 uElement) const;
+		A_I32 FindFirst(_In_ A_U64 uElement) const;
 
-		A_I32 FindFirst(_In_ A_FL32 fElement);
-		A_I32 FindFirst(_In_ A_FL64 fElement);
+		A_I32 FindFirst(_In_ A_FL32 fElement) const;
+		A_I32 FindFirst(_In_ A_FL64 fElement) const;
 
-		A_I32 FindFirst(_In_ A_BOOL bElement);
-		A_I32 FindFirst(_In_ A_LPVOID lpPointer);
-		A_I32 FindFirst(_In_z_ A_LPCSTR lpString);
+		A_I32 FindFirst(_In_ A_BOOL bElement) const;
+		A_I32 FindFirst(_In_ A_LPVOID lpPointer) const;
+		A_I32 FindFirst(_In_z_ A_LPCSTR lpString) const;
 
-		List<A_I32> Find(_In_ const String& str);
+		List<A_I32> Find(_In_ const String& str) const;
 
-		List<A_I32> Find(_In_ A_I8 nElement);
-		List<A_I32> Find(_In_ A_I16 nElement);
-		List<A_I32> Find(_In_ A_I32 nElement);
-		List<A_I32> Find(_In_ A_I64 nElement);
+		List<A_I32> Find(_In_ A_I8 nElement) const;
+		List<A_I32> Find(_In_ A_I16 nElement) const;
+		List<A_I32> Find(_In_ A_I32 nElement) const;
+		List<A_I32> Find(_In_ A_I64 nElement) const;
 
-		List<A_I32> Find(_In_ A_U8 uElement);
-		List<A_I32> Find(_In_ A_U16 uElement);
-		List<A_I32> Find(_In_ A_U32 uElement);
-		List<A_I32> Find(_In_ A_U64 uElement);
+		List<A_I32> Find(_In_ A_U8 uElement) const;
+		List<A_I32> Find(_In_ A_U16 uElement) const;
+		List<A_I32> Find(_In_ A_U32 uElement) const;
+		List<A_I32> Find(_In_ A_U64 uElement) const;
 
-		List<A_I32> Find(_In_ A_FL32 fElement);
-		List<A_I32> Find(_In_ A_FL64 fElement);
+		List<A_I32> Find(_In_ A_FL32 fElement) const;
+		List<A_I32> Find(_In_ A_FL64 fElement) const;
 
-		List<A_I32> Find(_In_ A_BOOL bElement);
-		List<A_I32> Find(_In_ A_LPVOID lpPointer);
-		List<A_I32> Find(_In_z_ A_LPCSTR lpString);
+		List<A_I32> Find(_In_ A_BOOL bElement) const;
+		List<A_I32> Find(_In_ A_LPVOID lpPointer) const;
+		List<A_I32> Find(_In_z_ A_LPCSTR lpString) const;
 
-		constexpr operator A_LPCSTR() const { return lpString; }
+		constexpr operator A_LPCSTR() const;
 
-		constexpr A_LPCSTR cstr() const { return lpString; }
+		constexpr A_LPCSTR cstr() const;
 		constexpr A_DWORD size() const { return dwLength; }
+
+		constexpr A_BOOL operator==(const String&) const;
+		constexpr A_BOOL operator!=(const String&) const;
+		constexpr String operator+(const String&) const;
+		constexpr A_VOID operator+=(const String&);
 	};
 }
 
