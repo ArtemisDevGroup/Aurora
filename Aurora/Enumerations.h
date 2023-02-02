@@ -8,21 +8,34 @@ namespace Aurora {
 	/// <para>This is used as a return value for the compare routine of the collection classes.</para>
 	/// <para>See guides or the API reference for usage examples.</para>
 	/// </summary>
-	enum class CompareResult : A_I32 {
-		/// <summary>
-		/// Element 1 is less than element 2.
-		/// </summary>
-		LessThan = -1,
+	struct CompareResult {
+		typedef A_I32 EnumSize;
 
-		/// <summary>
-		/// Element 1 and element 2 are equal.
-		/// </summary>
-		Equal = 0,
+		EnumSize nValue;
 
-		/// <summary>
-		/// Element 1 is more than element 2.
-		/// </summary>
-		MoreThan = 1
+	public:
+		enum Enum : EnumSize {
+			/// <summary>
+			/// Element 1 is less than element 2.
+			/// </summary>
+			LessThan = -1,
+
+			/// <summary>
+			/// Element 1 and element 2 are equal.
+			/// </summary>
+			Equal = 0,
+
+			/// <summary>
+			/// Element 1 is more than element 2.
+			/// </summary>
+			MoreThan = 1
+		};
+
+		constexpr CompareResult(_In_ A_I32 nValue) : nValue(nValue) {}
+		constexpr CompareResult(_In_ Enum nValue) : nValue((EnumSize)nValue) {}
+
+		constexpr operator A_I32() const { return nValue; }
+		constexpr operator Enum() const { return (Enum)nValue; }
 	};
 
 	enum class IntegralRepresentationFlags : A_I32 {

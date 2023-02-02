@@ -7,6 +7,7 @@
 
 #include <string.h>
 
+// Sets the context of all thrown exceptions to
 #define AuroraContextStart() A_DWORD dwKey = Aurora::GlobalExceptionContext::SetContext(__FUNCTION__)
 #define AuroraContextEnd() Aurora::GlobalExceptionContext::ResetContext(dwKey)
 
@@ -18,6 +19,8 @@ namespace Aurora {
 		~GlobalExceptionContext() = delete;
 
 		static A_DWORD SetContext(_In_ const String& Context);
+		static String GetContext();
+		static A_DWORD GetContextKey();
 		static A_VOID ResetContext(_In_ A_DWORD dwKey);
 	};
 
@@ -42,21 +45,25 @@ namespace Aurora {
 
 	template<class Derived>
 	class AURORA_API IExceptionContext {
-		A_CHAR szFile[MAX_PATH];
-		A_CHAR szFunction[MAX_NAME];
+		String Function;
+		String CoreFunction;
+		String FilePath;
 		A_I32 nLine;
 
 	public:
-		Derived WithContext(_In_z_ A_LPCSTR lpFunction, _In_z_ A_LPCSTR lpFile, _In_ A_I32 nLine) {
-			strcpy_s(szFunction, lpFunction);
-			strcpy_s(szFile, lpFile);
-			this->nLine = nLine;
+		Derived WithContext(_In_ const String& Function, _In_ const String& File, _In_ A_I32 nLine) { 
+			this->Function = GlobalExceptionContext::GetContext();
+			GlobalExceptionContext::ResetContext(GlobalExceptionContext::GetContextKey());
 
+			this->CoreFunction = Function;
+			this->FilePath = File;
+			this->nLine = nLine;
 			return *(Derived*)this;
 		}
 
-		constexpr A_LPCSTR GetFunction() const { return szFunction; }
-		constexpr A_LPCSTR GetFile() const { return szFile; }
+		constexpr const String& GetFunction() const { return Function; }
+		constexpr const String& GetCoreFunction() const { return CoreFunction; }
+		constexpr const String& GetFile() const { return FilePath; }
 		constexpr A_I32 GetLine() const { return nLine; }
 	};
 }

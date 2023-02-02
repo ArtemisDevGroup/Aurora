@@ -16,6 +16,10 @@ namespace Aurora {
 		else return AURORA_CONTEXT_KEY_INVALID;
 	}
 
+	String GlobalExceptionContext::GetContext() { return g_ExceptionContext; }
+
+	A_DWORD GlobalExceptionContext::GetContextKey() { return g_dwContextKey; }
+
 	A_VOID GlobalExceptionContext::ResetContext(_In_ A_DWORD dwKey) { if (g_bHasContext && dwKey == g_dwContextKey) g_bHasContext = false; }
 
 	IException::IException(_In_ const String& Message, _In_ const Identifier& Id) : Message(Message), Id(Id) {}
