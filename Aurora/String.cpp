@@ -349,7 +349,8 @@ namespace Aurora {
 	}
 
 	constexpr String String::operator+(const String& operand) const {
-		String ret = *this;
+		String ret;
+		this->Clone(&ret);
 		ret.Add(operand);
 		return ret;
 	}
