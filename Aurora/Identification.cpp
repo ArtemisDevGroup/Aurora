@@ -6,7 +6,7 @@
 namespace Aurora {
 	constexpr Identifier::Identifier() : desc() {}
 
-	constexpr Identifier Identifier::Create(_In_ const String& TypeName, _In_ A_DWORD dwObjectSize) {
+	Identifier Identifier::Create(_In_ const String& TypeName, _In_ A_DWORD dwObjectSize) {
 		Identifier ret;
 		
 		ret.desc.TypeName = TypeName;
@@ -44,7 +44,7 @@ namespace Aurora {
 		g_dwGlobalRotl += id.desc.dwObjectSize;
 	}
 
-	constexpr Identifier Identifier::CreateUnique(_In_ const String& TypeName, _In_ A_DWORD dwObjectSize) {
+	Identifier Identifier::CreateUnique(_In_ const String& TypeName, _In_ A_DWORD dwObjectSize) {
 		Identifier ret = Create(TypeName, dwObjectSize);
 		do { IdHelper_Rotl(ret); } while (!IdHelper_IsUnique(ret));
 		IdHelper_AddToList(ret);

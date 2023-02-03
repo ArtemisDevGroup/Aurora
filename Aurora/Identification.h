@@ -20,8 +20,8 @@ namespace Aurora {
 	public:
 		constexpr Identifier();
 
-		static constexpr Identifier Create(_In_ const String& TypeName, _In_ A_DWORD dwObjectSize);
-		static constexpr Identifier CreateUnique(_In_ const String& TypeName, _In_ A_DWORD dwObjectSize);
+		static Identifier Create(_In_ const String& TypeName, _In_ A_DWORD dwObjectSize);
+		static Identifier CreateUnique(_In_ const String& TypeName, _In_ A_DWORD dwObjectSize);
 
 		constexpr const IdentityDescriptor* GetDesc() const;
 
