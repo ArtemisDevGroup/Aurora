@@ -9,6 +9,19 @@
 #include "Interfaces.h"
 
 namespace Aurora {
+	template<typename Type1, typename Type2>
+	class Pair {
+		Type1 Field1;
+		Type2 Field2;
+
+	public:
+		Pair() : Field1(), Field2() {}
+		Pair(_In_ Type1 First, _In_ Type2 Second) : Field1(First), Field2(Second) {}
+
+		constexpr Type1 GetFirst() const { return Field1; }
+		constexpr Type2 GetSecond() const { return Field2; }
+	};
+
 	/// <summary>
 	/// A class for storing sequences of data.
 	/// </summary>

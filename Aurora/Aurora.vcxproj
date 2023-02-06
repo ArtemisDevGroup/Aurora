@@ -21,6 +21,8 @@
   <ItemGroup>
     <ClInclude Include="Array.h" />
     <ClInclude Include="Binary.h" />
+    <ClInclude Include="Color.h" />
+    <ClInclude Include="Console.h" />
     <ClInclude Include="Definitions.h" />
     <ClInclude Include="Enumerations.h" />
     <ClInclude Include="Events.h" />
@@ -29,8 +31,10 @@
     <ClInclude Include="Interfaces.h" />
     <ClInclude Include="String.h" />
     <ClInclude Include="Thread.h" />
+    <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Color.cpp" />
     <ClCompile Include="Exceptions.cpp" />
     <ClCompile Include="Identification.cpp" />
     <ClCompile Include="String.cpp" />

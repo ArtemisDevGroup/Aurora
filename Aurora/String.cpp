@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <varargs.h>
 
 namespace Aurora {
 	String::String() : lpString(nullptr), dwLength(0) {}
@@ -35,46 +36,129 @@ namespace Aurora {
 	A_VOID String::Add(_In_ const String& str, _In_ A_I32 nIndex) { Add(str.lpString, nIndex); }
 
 	A_VOID String::Add(_In_ A_I8 nElement, _In_ A_I32 nIndex, _In_ IntegralRepresentationFlags nFlags) {
-		A_CHAR szString[64];
-		sprintf_s(szString, "%hhi", nElement);
-		Add(szString, nIndex);
-	}
-
-	A_VOID String::Add(_In_ A_I16 nElement, _In_ A_I32 nIndex, _In_ IntegralRepresentationFlags nFlags) {
-		A_CHAR szString[64];
-		sprintf_s(szString, "%hi", nElement);
-		Add(szString, nIndex);
-	}
-
-	A_VOID String::Add(_In_ A_I32 nElement, _In_ A_I32 nIndex, _In_ IntegralRepresentationFlags nFlags) {
-		A_CHAR szString[64];
-		sprintf_s(szString, "%i", nElement);
-		Add(szString, nIndex);
-	}
-
-	A_VOID String::Add(_In_ A_I64 nElement, _In_ A_I32 nIndex, _In_ IntegralRepresentationFlags nFlags) {
-		A_CHAR szString[64];
+		Binary<decltype(nElement)> bin = nElement;
+		A_CHAR szString[bin.BufferBitCount + 1];
 
 		if (nFlags == IntegralRepresentationFlags::Binary) {
-			Binary<decltype(nElement)> bin = nElement;
-
 			for (A_I32 i = 0; i < bin.BufferBitCount; i++)
 				szString[i] = bin.CheckBit(i) ? '1' : '0';
 
 			szString[bin.BufferBitCount] = '\0';
 		}
 		else {
-			A_CHAR szFormat[5] = { '%', 'l', 'l', 0, '\0' };
+			A_CHAR szFormat[5] = { '%', 'h', 'h', 0, '\0'};
 
 			switch (nFlags) {
 			case IntegralRepresentationFlags::Octal:
-				szFormat[3] = 'o';
+				szFormat[sizeof(szFormat) - 2] = 'o';
 				break;
 			case IntegralRepresentationFlags::Decimal:
-				szFormat[3] = 'i';
+				szFormat[sizeof(szFormat) - 2] = 'i';
 				break;
 			case IntegralRepresentationFlags::Hexadecimal:
-				szFormat[3] = 'X';
+				szFormat[sizeof(szFormat) - 2] = 'X';
+				break;
+			default:
+				/* throw */
+				break;
+			}
+
+			sprintf_s(szString, szFormat, nElement);
+		}
+
+		Add(szString, nIndex);
+	}
+
+	A_VOID String::Add(_In_ A_I16 nElement, _In_ A_I32 nIndex, _In_ IntegralRepresentationFlags nFlags) {
+		Binary<decltype(nElement)> bin = nElement;
+		A_CHAR szString[bin.BufferBitCount + 1];
+
+		if (nFlags == IntegralRepresentationFlags::Binary) {
+			for (A_I32 i = 0; i < bin.BufferBitCount; i++)
+				szString[i] = bin.CheckBit(i) ? '1' : '0';
+
+			szString[bin.BufferBitCount] = '\0';
+		}
+		else {
+			A_CHAR szFormat[4] = { '%', 'h', 0, '\0'};
+
+			switch (nFlags) {
+			case IntegralRepresentationFlags::Octal:
+				szFormat[sizeof(szFormat) - 2] = 'o';
+				break;
+			case IntegralRepresentationFlags::Decimal:
+				szFormat[sizeof(szFormat) - 2] = 'i';
+				break;
+			case IntegralRepresentationFlags::Hexadecimal:
+				szFormat[sizeof(szFormat) - 2] = 'X';
+				break;
+			default:
+				/* throw */
+				break;
+			}
+
+			sprintf_s(szString, szFormat, nElement);
+		}
+
+		Add(szString, nIndex);
+	}
+
+	A_VOID String::Add(_In_ A_I32 nElement, _In_ A_I32 nIndex, _In_ IntegralRepresentationFlags nFlags) {
+		Binary<decltype(nElement)> bin = nElement;
+		A_CHAR szString[bin.BufferBitCount + 1];
+
+		if (nFlags == IntegralRepresentationFlags::Binary) {
+			for (A_I32 i = 0; i < bin.BufferBitCount; i++)
+				szString[i] = bin.CheckBit(i) ? '1' : '0';
+
+			szString[bin.BufferBitCount] = '\0';
+		}
+		else {
+			A_CHAR szFormat[3] = { '%', 0, '\0' };
+
+			switch (nFlags) {
+			case IntegralRepresentationFlags::Octal:
+				szFormat[sizeof(szFormat) - 2] = 'o';
+				break;
+			case IntegralRepresentationFlags::Decimal:
+				szFormat[sizeof(szFormat) - 2] = 'i';
+				break;
+			case IntegralRepresentationFlags::Hexadecimal:
+				szFormat[sizeof(szFormat) - 2] = 'X';
+				break;
+			default:
+				/* throw */
+				break;
+			}
+
+			sprintf_s(szString, szFormat, nElement);
+		}
+
+		Add(szString, nIndex);
+	}
+
+	A_VOID String::Add(_In_ A_I64 nElement, _In_ A_I32 nIndex, _In_ IntegralRepresentationFlags nFlags) {
+		Binary<decltype(nElement)> bin = nElement;
+		A_CHAR szString[bin.BufferBitCount + 1];
+
+		if (nFlags == IntegralRepresentationFlags::Binary) {
+			for (A_I32 i = 0; i < bin.BufferBitCount; i++)
+				szString[i] = bin.CheckBit(i) ? '1' : '0';
+
+			szString[bin.BufferBitCount] = '\0';
+		}
+		else {
+			A_CHAR szFormat[5] = { '%', 'l', 'l', 0, '\0'};
+
+			switch (nFlags) {
+			case IntegralRepresentationFlags::Octal:
+				szFormat[sizeof(szFormat) - 2] = 'o';
+				break;
+			case IntegralRepresentationFlags::Decimal:
+				szFormat[sizeof(szFormat) - 2] = 'i';
+				break;
+			case IntegralRepresentationFlags::Hexadecimal:
+				szFormat[sizeof(szFormat) - 2] = 'X';
 				break;
 			default:
 				/* throw */
@@ -88,26 +172,138 @@ namespace Aurora {
 	}
 
 	A_VOID String::Add(_In_ A_U8 uElement, _In_ A_I32 nIndex, _In_ IntegralRepresentationFlags nFlags) {
-		A_CHAR szString[64];
-		sprintf_s(szString, "%hhu", uElement);
+		Binary<decltype(uElement)> bin = uElement;
+		A_CHAR szString[bin.BufferBitCount + 1];
+
+		if (nFlags == IntegralRepresentationFlags::Binary) {
+			for (A_I32 i = 0; i < bin.BufferBitCount; i++)
+				szString[i] = bin.CheckBit(i) ? '1' : '0';
+
+			szString[bin.BufferBitCount] = '\0';
+		}
+		else {
+			A_CHAR szFormat[5] = { '%', 'h', 'h', 0, '\0' };
+
+			switch (nFlags) {
+			case IntegralRepresentationFlags::Octal:
+				szFormat[sizeof(szFormat) - 2] = 'o';
+				break;
+			case IntegralRepresentationFlags::Decimal:
+				szFormat[sizeof(szFormat) - 2] = 'u';
+				break;
+			case IntegralRepresentationFlags::Hexadecimal:
+				szFormat[sizeof(szFormat) - 2] = 'X';
+				break;
+			default:
+				/* throw */
+				break;
+			}
+
+			sprintf_s(szString, szFormat, uElement);
+		}
+
 		Add(szString, nIndex);
 	}
 
 	A_VOID String::Add(_In_ A_U16 uElement, _In_ A_I32 nIndex, _In_ IntegralRepresentationFlags nFlags) {
-		A_CHAR szString[64];
-		sprintf_s(szString, "%hu", uElement);
+		Binary<decltype(uElement)> bin = uElement;
+		A_CHAR szString[bin.BufferBitCount + 1];
+
+		if (nFlags == IntegralRepresentationFlags::Binary) {
+			for (A_I32 i = 0; i < bin.BufferBitCount; i++)
+				szString[i] = bin.CheckBit(i) ? '1' : '0';
+
+			szString[bin.BufferBitCount] = '\0';
+		}
+		else {
+			A_CHAR szFormat[4] = { '%', 'h', 0, '\0' };
+
+			switch (nFlags) {
+			case IntegralRepresentationFlags::Octal:
+				szFormat[sizeof(szFormat) - 2] = 'o';
+				break;
+			case IntegralRepresentationFlags::Decimal:
+				szFormat[sizeof(szFormat) - 2] = 'u';
+				break;
+			case IntegralRepresentationFlags::Hexadecimal:
+				szFormat[sizeof(szFormat) - 2] = 'X';
+				break;
+			default:
+				/* throw */
+				break;
+			}
+
+			sprintf_s(szString, szFormat, uElement);
+		}
+
 		Add(szString, nIndex);
 	}
 
 	A_VOID String::Add(_In_ A_U32 uElement, _In_ A_I32 nIndex, _In_ IntegralRepresentationFlags nFlags) {
-		A_CHAR szString[64];
-		sprintf_s(szString, "%u", uElement);
+		Binary<decltype(uElement)> bin = uElement;
+		A_CHAR szString[bin.BufferBitCount + 1];
+
+		if (nFlags == IntegralRepresentationFlags::Binary) {
+			for (A_I32 i = 0; i < bin.BufferBitCount; i++)
+				szString[i] = bin.CheckBit(i) ? '1' : '0';
+
+			szString[bin.BufferBitCount] = '\0';
+		}
+		else {
+			A_CHAR szFormat[3] = { '%', 0, '\0' };
+
+			switch (nFlags) {
+			case IntegralRepresentationFlags::Octal:
+				szFormat[sizeof(szFormat) - 2] = 'o';
+				break;
+			case IntegralRepresentationFlags::Decimal:
+				szFormat[sizeof(szFormat) - 2] = 'u';
+				break;
+			case IntegralRepresentationFlags::Hexadecimal:
+				szFormat[sizeof(szFormat) - 2] = 'X';
+				break;
+			default:
+				/* throw */
+				break;
+			}
+
+			sprintf_s(szString, szFormat, uElement);
+		}
+
 		Add(szString, nIndex);
 	}
 
 	A_VOID String::Add(_In_ A_U64 uElement, _In_ A_I32 nIndex, _In_ IntegralRepresentationFlags nFlags) {
-		A_CHAR szString[64];
-		sprintf_s(szString, "%llu", uElement);
+		Binary<decltype(uElement)> bin = uElement;
+		A_CHAR szString[bin.BufferBitCount + 1];
+
+		if (nFlags == IntegralRepresentationFlags::Binary) {
+			for (A_I32 i = 0; i < bin.BufferBitCount; i++)
+				szString[i] = bin.CheckBit(i) ? '1' : '0';
+
+			szString[bin.BufferBitCount] = '\0';
+		}
+		else {
+			A_CHAR szFormat[5] = { '%', 'l', 'l', 0, '\0' };
+
+			switch (nFlags) {
+			case IntegralRepresentationFlags::Octal:
+				szFormat[sizeof(szFormat) - 2] = 'o';
+				break;
+			case IntegralRepresentationFlags::Decimal:
+				szFormat[sizeof(szFormat) - 2] = 'u';
+				break;
+			case IntegralRepresentationFlags::Hexadecimal:
+				szFormat[sizeof(szFormat) - 2] = 'X';
+				break;
+			default:
+				/* throw */
+				break;
+			}
+
+			sprintf_s(szString, szFormat, uElement);
+		}
+
 		Add(szString, nIndex);
 	}
 
@@ -145,27 +341,43 @@ namespace Aurora {
 	A_VOID String::Add(_In_z_ A_LPCSTR lpString, _In_ A_I32 nIndex) {
 		if (nIndex >= dwLength) /* throw */;
 
-		A_DWORD dwStrlen = strlen(lpString);
-		A_DWORD dwNewLength = this->dwLength + dwStrlen;
-		A_LPSTR lpOld = this->lpString;
-		this->lpString = new A_CHAR[dwNewLength + 1];
+		if (this->lpString) {
+			A_DWORD dwStrlen = strlen(lpString);
+			A_DWORD dwNewLength = this->dwLength + dwStrlen;
+			A_LPSTR lpOld = this->lpString;
+			this->lpString = new A_CHAR[dwNewLength + 1];
 
-		if (nIndex == -1) {
-			strcpy_s(this->lpString, dwNewLength + 1, lpOld);
-			strcat_s(this->lpString, dwNewLength + 1, lpString);
+			if (nIndex == -1) {
+				strcpy_s(this->lpString, dwNewLength + 1, lpOld);
+				strcat_s(this->lpString, dwNewLength + 1, lpString);
+			}
+			else {
+				for (int i = 0; i < nIndex; i++)
+					this->lpString[i] = lpOld[i];
+				for (int i = 0; i < dwStrlen; i++)
+					this->lpString[nIndex + i] = lpString[i];
+				for (int i = 0; i < dwNewLength - (nIndex + dwStrlen); i++)
+					this->lpString[nIndex + dwStrlen + i] = lpOld[nIndex + i];
+				this->lpString[dwNewLength] = '\0';
+			}
+
+			delete[] lpOld;
+			dwLength = dwNewLength;
 		}
 		else {
-			for (int i = 0; i < nIndex; i++)
-				this->lpString[i] = lpOld[i];
-			for (int i = 0; i < dwStrlen; i++)
-				this->lpString[nIndex + i] = lpString[i];
-			for (int i = 0; i < dwNewLength - (nIndex + dwStrlen); i++)
-				this->lpString[nIndex + dwStrlen + i] = lpOld[nIndex + i];
-			this->lpString[dwNewLength] = '\0';
+			dwLength = strlen(lpString);
+			this->lpString = new A_CHAR[dwLength + 1];
+			strcpy_s(this->lpString, dwLength + 1, lpString);
 		}
+	}
 
-		delete[] lpOld;
-		dwLength = dwNewLength;
+	A_VOID String::AddFormat(_In_ A_I32 nIndex, _In_z_ _Printf_format_string_ A_LPCSTR lpFormat, ...) {
+		A_CHAR szString[MAX_MSG];
+
+		va_list v;
+		va_start(v, lpString);
+		vsprintf_s(szString, lpFormat, v);
+		va_end(v);
 	}
 
 	A_VOID String::Remove(_In_ A_I32 nCount, _In_ A_I32 nIndex) {

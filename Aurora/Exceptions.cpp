@@ -1,12 +1,22 @@
 #include "Exceptions.h"
 
+#include <Windows.h>
+#undef GetMessage
+
 #define AURORA_CONTEXT_KEY_INVALID 0
 
 namespace Aurora {
+	//------------------------------------------------------------------------>
+	// Identifiers
+	namespace Identifiers {
+		const Identifier WindowsApiExceptionId = Identifier::Create("WindowsApiException", sizeof(WindowsApiException));
+	}
+	//------------------------------------------------------------------------>
+	// GlobalExceptionContext
 	String g_ExceptionContext;
 	A_DWORD g_dwContextKey = AURORA_CONTEXT_KEY_INVALID;
 	A_BOOL g_bHasContext = false;
-
+	//-----------------------------------
 	A_DWORD GlobalExceptionContext::SetContext(_In_ const String& Context) {
 		if (!g_bHasContext) {
 			g_ExceptionContext = Context;
@@ -15,40 +25,57 @@ namespace Aurora {
 		}
 		else return AURORA_CONTEXT_KEY_INVALID;
 	}
-
+	//-----------------------------------
 	String GlobalExceptionContext::GetContext() { return g_ExceptionContext; }
-
+	//-----------------------------------
 	A_DWORD GlobalExceptionContext::GetContextKey() { return g_dwContextKey; }
-
+	//-----------------------------------
 	A_VOID GlobalExceptionContext::ResetContext(_In_ A_DWORD dwKey) { if (g_bHasContext && dwKey == g_dwContextKey) g_bHasContext = false; }
-
+	//------------------------------------------------------------------------>
+	// IException
 	IException::IException(_In_ const String& Message, _In_ const Identifier& Id) : Message(Message), Id(Id) {}
-
+	//-----------------------------------
 	constexpr const String& IException::GetMessage() const { return Message; }
-
+	//-----------------------------------
 	constexpr const Identifier& IException::GetIdentifier() const { return Id; }
-
+	//-----------------------------------
 	A_BOOL IException::operator==(const IException& operand) const {
 		return Message == operand.Message && Id == operand.Id;
 	}
-
+	//-----------------------------------
 	constexpr A_BOOL IException::operator==(const Identifier& operand) const {
 		return Id == operand;
 	}
-
+	//-----------------------------------
 	A_BOOL IException::operator==(const String& operand) const {
 		return Message == operand;
 	}
-
+	//-----------------------------------
 	A_BOOL IException::operator!=(const IException& operand) const {
 		return Message != operand.Message || Id != operand.Id;
 	}
-
+	//-----------------------------------
 	constexpr A_BOOL IException::operator!=(const Identifier& operand) const {
 		return Id != operand;
 	}
-
+	//-----------------------------------
 	A_BOOL IException::operator!=(const String& operand) const {
 		return Message != operand;
 	}
+	//------------------------------------------------------------------------>
+	// WindowsApiException
+	WindowsApiException::WindowsApiException(_In_ const String& WindowsApiFunction) : IException("A Windows API call failed.", Identifiers::WindowsApiExceptionId), WindowsApiFunction(WindowsApiFunction) {
+		dwWindowsApiCode = GetLastError();
+
+		A_CHAR szMessageBuffer[MAX_MSG];
+		FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, dwWindowsApiCode, LANG_SYSTEM_DEFAULT, szMessageBuffer, MAX_MSG, nullptr);
+
+		WindowsApiMessage = szMessageBuffer;
+	}
+	//-----------------------------------
+	constexpr A_DWORD WindowsApiException::GetWindowsCode() const { return dwWindowsApiCode; }
+	//-----------------------------------
+	constexpr const String& WindowsApiException::GetWindowsMessage() const { return WindowsApiMessage; }
+	//-----------------------------------
+	constexpr const String& WindowsApiException::GetWindowsFunction() const { return WindowsApiFunction; }
 }

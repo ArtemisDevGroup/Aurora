@@ -9,7 +9,7 @@ namespace Aurora {
 	Identifier Identifier::Create(_In_ const String& TypeName, _In_ A_DWORD dwObjectSize) {
 		Identifier ret;
 		
-		ret.desc.TypeName = TypeName;
+		TypeName.Clone(&ret.desc.TypeName);
 		ret.desc.dwObjectSize = dwObjectSize;
 
 		for (A_I32 i = 0; i < ret.desc.TypeName.GetLength(); i++) {

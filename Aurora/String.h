@@ -48,6 +48,8 @@ namespace Aurora {
 		A_VOID Add(_In_ A_LPVOID lpPointer, _In_ A_I32 nIndex = -1);
 		A_VOID Add(_In_z_ A_LPCSTR lpString, _In_ A_I32 nIndex = -1);
 
+		A_VOID AddFormat(_In_ A_I32 nIndex, _In_z_ _Printf_format_string_ A_LPCSTR lpFormat, ...);
+
 		A_VOID Remove(_In_ A_I32 nCount = 1, _In_ A_I32 nIndex = -1);
 
 		A_I32 FindFirst(_In_ const String& str) const;

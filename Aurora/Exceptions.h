@@ -9,9 +9,16 @@
 
 // Sets the context of all thrown exceptions to report the current function as the origin of the call.
 #define AuroraContextStart() A_DWORD dwKey = Aurora::GlobalExceptionContext::SetContext(__FUNCTION__)
+// Ends the contextualized call. Should be called right before returning.
 #define AuroraContextEnd() Aurora::GlobalExceptionContext::ResetContext(dwKey)
 
+#define AuroraThrow(Exception) throw Exception.WithContext(__FUNCTION__, __FILE__, __LINE__)
+
 namespace Aurora {
+	namespace Identifiers {
+		// extern const Identifier WindowsApiExceptionId;
+	}
+
 	class AURORA_API GlobalExceptionContext {
 	public:
 		GlobalExceptionContext() = delete;
@@ -51,7 +58,9 @@ namespace Aurora {
 		A_I32 nLine;
 
 	public:
-		Derived WithContext(_In_ const String& Function, _In_ const String& File, _In_ A_I32 nLine) { 
+		inline IExceptionContext() : Function(), CoreFunction(), FilePath(), nLine(0) {}
+
+		inline Derived WithContext(_In_ const String& Function, _In_ const String& File, _In_ A_I32 nLine) {
 			this->Function = GlobalExceptionContext::GetContext();
 			GlobalExceptionContext::ResetContext(GlobalExceptionContext::GetContextKey());
 
@@ -65,6 +74,18 @@ namespace Aurora {
 		constexpr const String& GetCoreFunction() const { return CoreFunction; }
 		constexpr const String& GetFile() const { return FilePath; }
 		constexpr A_I32 GetLine() const { return nLine; }
+	};
+
+	class WindowsApiException : public IException, public IExceptionContext<WindowsApiException> {
+		A_DWORD dwWindowsApiCode;
+		String WindowsApiMessage;
+		String WindowsApiFunction;
+
+	public:
+		WindowsApiException(_In_ const String& WindowsApiFunction);
+		constexpr A_DWORD GetWindowsCode() const;
+		constexpr const String& GetWindowsMessage() const;
+		constexpr const String& GetWindowsFunction() const;
 	};
 }
 
