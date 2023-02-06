@@ -42,6 +42,9 @@
     <ClInclude Include="Enumerations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Binary.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Identification.cpp">

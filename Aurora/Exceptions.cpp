@@ -28,7 +28,7 @@ namespace Aurora {
 
 	constexpr const Identifier& IException::GetIdentifier() const { return Id; }
 
-	constexpr A_BOOL IException::operator==(const IException& operand) const {
+	A_BOOL IException::operator==(const IException& operand) const {
 		return Message == operand.Message && Id == operand.Id;
 	}
 
@@ -36,11 +36,11 @@ namespace Aurora {
 		return Id == operand;
 	}
 
-	constexpr A_BOOL IException::operator==(const String& operand) const {
+	A_BOOL IException::operator==(const String& operand) const {
 		return Message == operand;
 	}
 
-	constexpr A_BOOL IException::operator!=(const IException& operand) const {
+	A_BOOL IException::operator!=(const IException& operand) const {
 		return Message != operand.Message || Id != operand.Id;
 	}
 
@@ -48,7 +48,7 @@ namespace Aurora {
 		return Id != operand;
 	}
 
-	constexpr A_BOOL IException::operator!=(const String& operand) const {
+	A_BOOL IException::operator!=(const String& operand) const {
 		return Message != operand;
 	}
 }

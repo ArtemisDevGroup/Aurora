@@ -2,6 +2,7 @@
 #define __AURORA_STRING_H__
 
 #include "Definitions.h"
+#include "Enumerations.h"
 #include "Interfaces.h"
 #include "Array.h"
 
@@ -29,19 +30,20 @@ namespace Aurora {
 		/// <param name="nIndex"></param>
 		A_VOID Add(_In_ const String& str, _In_ A_I32 nIndex = -1);
 
-		A_VOID Add(_In_ A_I8 nElement, _In_ A_I32 nIndex = -1);
-		A_VOID Add(_In_ A_I16 nElement, _In_ A_I32 nIndex = -1);
-		A_VOID Add(_In_ A_I32 nElement, _In_ A_I32 nIndex = -1);
-		A_VOID Add(_In_ A_I64 nElement, _In_ A_I32 nIndex = -1);
+		A_VOID Add(_In_ A_I8 nElement, _In_ A_I32 nIndex = -1, _In_ IntegralRepresentationFlags nFlags = IntegralRepresentationFlags::Decimal);
+		A_VOID Add(_In_ A_I16 nElement, _In_ A_I32 nIndex = -1, _In_ IntegralRepresentationFlags nFlags = IntegralRepresentationFlags::Decimal);
+		A_VOID Add(_In_ A_I32 nElement, _In_ A_I32 nIndex = -1, _In_ IntegralRepresentationFlags nFlags = IntegralRepresentationFlags::Decimal);
+		A_VOID Add(_In_ A_I64 nElement, _In_ A_I32 nIndex = -1, _In_ IntegralRepresentationFlags nFlags = IntegralRepresentationFlags::Decimal);
 
-		A_VOID Add(_In_ A_U8 uElement, _In_ A_I32 nIndex = -1);
-		A_VOID Add(_In_ A_U16 uElement, _In_ A_I32 nIndex = -1);
-		A_VOID Add(_In_ A_U32 uElement, _In_ A_I32 nIndex = -1);
-		A_VOID Add(_In_ A_U64 uElement, _In_ A_I32 nIndex = -1);
+		A_VOID Add(_In_ A_U8 uElement, _In_ A_I32 nIndex = -1, _In_ IntegralRepresentationFlags nFlags = IntegralRepresentationFlags::Decimal);
+		A_VOID Add(_In_ A_U16 uElement, _In_ A_I32 nIndex = -1, _In_ IntegralRepresentationFlags nFlags = IntegralRepresentationFlags::Decimal);
+		A_VOID Add(_In_ A_U32 uElement, _In_ A_I32 nIndex = -1, _In_ IntegralRepresentationFlags nFlags = IntegralRepresentationFlags::Decimal);
+		A_VOID Add(_In_ A_U64 uElement, _In_ A_I32 nIndex = -1, _In_ IntegralRepresentationFlags nFlags = IntegralRepresentationFlags::Decimal);
 
 		A_VOID Add(_In_ A_FL32 fElement, _In_ A_I32 nIndex = -1);
 		A_VOID Add(_In_ A_FL64 fElement, _In_ A_I32 nIndex = -1);
 
+		A_VOID Add(_In_ A_CHAR cElement, _In_ CharacterRepresentation nCharRep, _In_ A_I32 nIndex = -1);
 		A_VOID Add(_In_ A_BOOL bElement, _In_ A_I32 nIndex = -1);
 		A_VOID Add(_In_ A_LPVOID lpPointer, _In_ A_I32 nIndex = -1);
 		A_VOID Add(_In_z_ A_LPCSTR lpString, _In_ A_I32 nIndex = -1);
@@ -88,13 +90,13 @@ namespace Aurora {
 
 		constexpr operator A_LPCSTR() const;
 
-		constexpr A_LPCSTR cstr() const;
-		constexpr A_DWORD size() const { return dwLength; }
+		constexpr A_LPCSTR GetCString() const;
+		constexpr A_DWORD GetLength() const;
 
-		constexpr A_BOOL operator==(const String&) const;
-		constexpr A_BOOL operator!=(const String&) const;
-		constexpr String operator+(const String&) const;
-		constexpr A_VOID operator+=(const String&);
+		A_BOOL operator==(const String&) const;
+		A_BOOL operator!=(const String&) const;
+		String operator+(const String&) const;
+		A_VOID operator+=(const String&);
 	};
 }
 

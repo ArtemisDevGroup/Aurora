@@ -14,11 +14,12 @@ namespace Aurora {
 	class AURORA_API Identifier {
 		IdentityDescriptor desc;
 
+		static constexpr A_U32 IdHelper_rotl32(_In_ A_U32 uValue, _In_ A_U32 uShift);
 		static constexpr A_VOID IdHelper_AddToList(_In_ const Identifier& id);
 		static constexpr A_BOOL IdHelper_IsUnique(_In_ const Identifier& id);
 		static constexpr A_VOID IdHelper_Rotl(_Inout_ Identifier& id);
 	public:
-		constexpr Identifier();
+		Identifier();
 
 		static Identifier Create(_In_ const String& TypeName, _In_ A_DWORD dwObjectSize);
 		static Identifier CreateUnique(_In_ const String& TypeName, _In_ A_DWORD dwObjectSize);

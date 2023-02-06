@@ -7,7 +7,7 @@
 
 #include <string.h>
 
-// Sets the context of all thrown exceptions to
+// Sets the context of all thrown exceptions to report the current function as the origin of the call.
 #define AuroraContextStart() A_DWORD dwKey = Aurora::GlobalExceptionContext::SetContext(__FUNCTION__)
 #define AuroraContextEnd() Aurora::GlobalExceptionContext::ResetContext(dwKey)
 
@@ -34,13 +34,13 @@ namespace Aurora {
 		constexpr const String& GetMessage() const;
 		constexpr const Identifier& GetIdentifier() const;
 
-		constexpr A_BOOL operator==(const IException&) const;
+		A_BOOL operator==(const IException&) const;
 		constexpr A_BOOL operator==(const Identifier&) const;
-		constexpr A_BOOL operator==(const String&) const;
+		A_BOOL operator==(const String&) const;
 
-		constexpr A_BOOL operator!=(const IException&) const;
+		A_BOOL operator!=(const IException&) const;
 		constexpr A_BOOL operator!=(const Identifier&) const;
-		constexpr A_BOOL operator!=(const String&) const;
+		A_BOOL operator!=(const String&) const;
 	};
 
 	template<class Derived>

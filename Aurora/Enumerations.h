@@ -1,4 +1,5 @@
 #ifndef __AURORA_ENUMERATIONS_H__
+#define __AURORA_ENUMERATIONS_H__
 
 #include "Definitions.h"
 
@@ -9,6 +10,7 @@ namespace Aurora {
 	/// <para>See guides or the API reference for usage examples.</para>
 	/// </summary>
 	struct CompareResult {
+	private:
 		typedef A_I32 EnumSize;
 
 		EnumSize nValue;
@@ -31,19 +33,33 @@ namespace Aurora {
 			MoreThan = 1
 		};
 
-		constexpr CompareResult(_In_ A_I32 nValue) : nValue(nValue) {}
+		constexpr CompareResult() : nValue(0) {}
+		constexpr CompareResult(_In_ EnumSize nValue) : nValue(nValue) {}
 		constexpr CompareResult(_In_ Enum nValue) : nValue((EnumSize)nValue) {}
 
-		constexpr operator A_I32() const { return nValue; }
 		constexpr operator Enum() const { return (Enum)nValue; }
 	};
 
-	enum class IntegralRepresentationFlags : A_I32 {
-		Binary = 1 << 0,
-		Octal = 1 << 1,
-		Decimal = 1 << 2,
-		Hexadecimal = 1 << 3,
-		All = Binary | Octal | Decimal | Hexadecimal
+	struct IntegralRepresentationFlags {
+	private:
+		typedef A_DWORD EnumSize;
+
+		EnumSize nValue;
+
+	public:
+		enum Enum : EnumSize {
+			Binary = 1 << 0,
+			Octal = 1 << 1,
+			Decimal = 1 << 2,
+			Hexadecimal = 1 << 3,
+			All = Binary | Octal | Decimal | Hexadecimal
+		};
+
+		constexpr IntegralRepresentationFlags() : nValue(0) {}
+		constexpr IntegralRepresentationFlags(_In_ EnumSize nValue) : nValue(nValue) {}
+		constexpr IntegralRepresentationFlags(_In_ Enum nValue) : nValue((EnumSize)nValue) {}
+
+		constexpr operator Enum() const { return (Enum)nValue; }
 	};
 
 	enum class CharacterRepresentation : A_I32 {

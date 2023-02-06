@@ -1,4 +1,5 @@
 #include "String.h"
+#include "Binary.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -31,81 +32,117 @@ namespace Aurora {
 
 	String::~String() { Release(); }
 
-	A_VOID String::Add(_In_ const String& str, _In_ A_I32 nIndex = -1) { Add(str.lpString, nIndex); }
+	A_VOID String::Add(_In_ const String& str, _In_ A_I32 nIndex) { Add(str.lpString, nIndex); }
 
-	A_VOID String::Add(_In_ A_I8 nElement, _In_ A_I32 nIndex = -1) {
+	A_VOID String::Add(_In_ A_I8 nElement, _In_ A_I32 nIndex, _In_ IntegralRepresentationFlags nFlags) {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%hhi", nElement);
 		Add(szString, nIndex);
 	}
 
-	A_VOID String::Add(_In_ A_I16 nElement, _In_ A_I32 nIndex = -1) {
+	A_VOID String::Add(_In_ A_I16 nElement, _In_ A_I32 nIndex, _In_ IntegralRepresentationFlags nFlags) {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%hi", nElement);
 		Add(szString, nIndex);
 	}
 
-	A_VOID String::Add(_In_ A_I32 nElement, _In_ A_I32 nIndex = -1) {
+	A_VOID String::Add(_In_ A_I32 nElement, _In_ A_I32 nIndex, _In_ IntegralRepresentationFlags nFlags) {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%i", nElement);
 		Add(szString, nIndex);
 	}
 
-	A_VOID String::Add(_In_ A_I64 nElement, _In_ A_I32 nIndex = -1) {
+	A_VOID String::Add(_In_ A_I64 nElement, _In_ A_I32 nIndex, _In_ IntegralRepresentationFlags nFlags) {
 		A_CHAR szString[64];
-		sprintf_s(szString, "%lli", nElement);
+
+		if (nFlags == IntegralRepresentationFlags::Binary) {
+			Binary<decltype(nElement)> bin = nElement;
+
+			for (A_I32 i = 0; i < bin.BufferBitCount; i++)
+				szString[i] = bin.CheckBit(i) ? '1' : '0';
+
+			szString[bin.BufferBitCount] = '\0';
+		}
+		else {
+			A_CHAR szFormat[5] = { '%', 'l', 'l', 0, '\0' };
+
+			switch (nFlags) {
+			case IntegralRepresentationFlags::Octal:
+				szFormat[3] = 'o';
+				break;
+			case IntegralRepresentationFlags::Decimal:
+				szFormat[3] = 'i';
+				break;
+			case IntegralRepresentationFlags::Hexadecimal:
+				szFormat[3] = 'X';
+				break;
+			default:
+				/* throw */
+				break;
+			}
+
+			sprintf_s(szString, szFormat, nElement);
+		}
+
 		Add(szString, nIndex);
 	}
 
-	A_VOID String::Add(_In_ A_U8 uElement, _In_ A_I32 nIndex = -1) {
+	A_VOID String::Add(_In_ A_U8 uElement, _In_ A_I32 nIndex, _In_ IntegralRepresentationFlags nFlags) {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%hhu", uElement);
 		Add(szString, nIndex);
 	}
 
-	A_VOID String::Add(_In_ A_U16 uElement, _In_ A_I32 nIndex = -1) {
+	A_VOID String::Add(_In_ A_U16 uElement, _In_ A_I32 nIndex, _In_ IntegralRepresentationFlags nFlags) {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%hu", uElement);
 		Add(szString, nIndex);
 	}
 
-	A_VOID String::Add(_In_ A_U32 uElement, _In_ A_I32 nIndex = -1) {
+	A_VOID String::Add(_In_ A_U32 uElement, _In_ A_I32 nIndex, _In_ IntegralRepresentationFlags nFlags) {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%u", uElement);
 		Add(szString, nIndex);
 	}
 
-	A_VOID String::Add(_In_ A_U64 uElement, _In_ A_I32 nIndex = -1) {
+	A_VOID String::Add(_In_ A_U64 uElement, _In_ A_I32 nIndex, _In_ IntegralRepresentationFlags nFlags) {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%llu", uElement);
 		Add(szString, nIndex);
 	}
 
-	A_VOID String::Add(_In_ A_FL32 fElement, _In_ A_I32 nIndex = -1) {
+	A_VOID String::Add(_In_ A_FL32 fElement, _In_ A_I32 nIndex) {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%f", fElement);
 		Add(szString, nIndex);
 	}
 
-	A_VOID String::Add(_In_ A_FL64 fElement, _In_ A_I32 nIndex = -1) {
+	A_VOID String::Add(_In_ A_FL64 fElement, _In_ A_I32 nIndex) {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%f", fElement);
 		Add(szString, nIndex);
 	}
 
-	A_VOID String::Add(_In_ A_BOOL bElement, _In_ A_I32 nIndex = -1) {
+	A_VOID String::Add(_In_ A_CHAR cElement, _In_ CharacterRepresentation nCharRep, _In_ A_I32 nIndex) {
+		if (nCharRep == CharacterRepresentation::ANSI) {
+			A_CHAR szString[2] = { cElement, '\0' };
+			Add(szString, nIndex);
+		}
+	}
+
+	A_VOID String::Add(_In_ A_BOOL bElement, _In_ A_I32 nIndex) {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%s", bElement ? "true" : "false");
 		Add(szString, nIndex);
 	}
 
-	A_VOID String::Add(_In_ A_LPVOID lpPointer, _In_ A_I32 nIndex = -1) {
+	A_VOID String::Add(_In_ A_LPVOID lpPointer, _In_ A_I32 nIndex) {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%p", lpPointer);
 		Add(szString, nIndex);
 	}
 
-	A_VOID String::Add(_In_z_ A_LPCSTR lpString, _In_ A_I32 nIndex = -1) {
+	A_VOID String::Add(_In_z_ A_LPCSTR lpString, _In_ A_I32 nIndex) {
 		if (nIndex >= dwLength) /* throw */;
 
 		A_DWORD dwStrlen = strlen(lpString);
@@ -147,79 +184,79 @@ namespace Aurora {
 	}
 
 	A_I32 String::FindFirst(_In_ const String& str) const {
-		return FindFirst(str.cstr());
+		return FindFirst(str.GetCString());
 	}
 
 	A_I32 String::FindFirst(_In_ A_I8 nElement) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%hhi", nElement);
-		FindFirst(szString);
+		return FindFirst(szString);
 	}
 
 	A_I32 String::FindFirst(_In_ A_I16 nElement) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%hi", nElement);
-		FindFirst(szString);
+		return FindFirst(szString);
 	}
 
 	A_I32 String::FindFirst(_In_ A_I32 nElement) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%i", nElement);
-		FindFirst(szString);
+		return FindFirst(szString);
 	}
 
 	A_I32 String::FindFirst(_In_ A_I64 nElement) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%lli", nElement);
-		FindFirst(szString);
+		return FindFirst(szString);
 	}
 
 	A_I32 String::FindFirst(_In_ A_U8 uElement) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%hhu", uElement);
-		FindFirst(szString);
+		return FindFirst(szString);
 	}
 
 	A_I32 String::FindFirst(_In_ A_U16 uElement) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%hu", uElement);
-		FindFirst(szString);
+		return FindFirst(szString);
 	}
 
 	A_I32 String::FindFirst(_In_ A_U32 uElement) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%u", uElement);
-		FindFirst(szString);
+		return FindFirst(szString);
 	}
 
 	A_I32 String::FindFirst(_In_ A_U64 uElement) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%llu", uElement);
-		FindFirst(szString);
+		return FindFirst(szString);
 	}
 
 	A_I32 String::FindFirst(_In_ A_FL32 fElement) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%f", fElement);
-		FindFirst(szString);
+		return FindFirst(szString);
 	}
 
 	A_I32 String::FindFirst(_In_ A_FL64 fElement) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%f", fElement);
-		FindFirst(szString);
+		return FindFirst(szString);
 	}
 
 	A_I32 String::FindFirst(_In_ A_BOOL bElement) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%s", bElement ? "true" : "false");
-		FindFirst(szString);
+		return FindFirst(szString);
 	}
 
 	A_I32 String::FindFirst(_In_ A_LPVOID lpPointer) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%p", lpPointer);
-		FindFirst(szString);
+		return FindFirst(szString);
 	}
 
 	A_I32 String::FindFirst(_In_z_ A_LPCSTR lpString) const {
@@ -240,79 +277,79 @@ namespace Aurora {
 	}
 
 	List<A_I32> String::Find(_In_ const String& str) const {
-		return Find(str.cstr());
+		return Find(str.GetCString());
 	}
 
 	List<A_I32> String::Find(_In_ A_I8 nElement) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%hhi", nElement);
-		Find(szString);
+		return Find(szString);
 	}
 
 	List<A_I32> String::Find(_In_ A_I16 nElement) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%hi", nElement);
-		Find(szString);
+		return Find(szString);
 	}
 
 	List<A_I32> String::Find(_In_ A_I32 nElement) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%i", nElement);
-		Find(szString);
+		return Find(szString);
 	}
 
 	List<A_I32> String::Find(_In_ A_I64 nElement) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%lli", nElement);
-		Find(szString);
+		return Find(szString);
 	}
 
 	List<A_I32> String::Find(_In_ A_U8 uElement) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%hhu", uElement);
-		Find(szString);
+		return Find(szString);
 	}
 
 	List<A_I32> String::Find(_In_ A_U16 uElement) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%hu", uElement);
-		Find(szString);
+		return Find(szString);
 	}
 
 	List<A_I32> String::Find(_In_ A_U32 uElement) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%u", uElement);
-		Find(szString);
+		return Find(szString);
 	}
 
 	List<A_I32> String::Find(_In_ A_U64 uElement) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%llu", uElement);
-		Find(szString);
+		return Find(szString);
 	}
 
 	List<A_I32> String::Find(_In_ A_FL32 fElement) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%f", fElement);
-		Find(szString);
+		return Find(szString);
 	}
 
 	List<A_I32> String::Find(_In_ A_FL64 fElement) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%f", fElement);
-		Find(szString);
+		return Find(szString);
 	}
 
 	List<A_I32> String::Find(_In_ A_BOOL bElement) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%s", bElement ? "true" : "false");
-		Find(szString);
+		return Find(szString);
 	}
 
 	List<A_I32> String::Find(_In_ A_LPVOID lpPointer) const {
 		A_CHAR szString[64];
 		sprintf_s(szString, "%p", lpPointer);
-		Find(szString);
+		return Find(szString);
 	}
 
 	List<A_I32> String::Find(_In_z_ A_LPCSTR lpString) const {
@@ -337,23 +374,23 @@ namespace Aurora {
 
 	constexpr String::operator A_LPCSTR() const { return lpString; }
 
-	constexpr A_LPCSTR String::cstr() const { return lpString; }
-	constexpr A_DWORD String::size() const { return dwLength; }
+	constexpr A_LPCSTR String::GetCString() const { return lpString; }
+	constexpr A_DWORD String::GetLength() const { return dwLength; }
 
-	constexpr A_BOOL String::operator==(const String& operand) const {
+	A_BOOL String::operator==(const String& operand) const {
 		return !strcmp(lpString, operand.lpString);
 	}
 
-	constexpr A_BOOL String::operator!=(const String& operand) const {
+	A_BOOL String::operator!=(const String& operand) const {
 		return !strcmp(lpString, operand.lpString);
 	}
 
-	constexpr String String::operator+(const String& operand) const {
+	String String::operator+(const String& operand) const {
 		String ret;
 		this->Clone(&ret);
 		ret.Add(operand);
 		return ret;
 	}
 
-	constexpr A_VOID String::operator+=(const String& operand) { this->Add(operand); }
+	A_VOID String::operator+=(const String& operand) { this->Add(operand); }
 }
