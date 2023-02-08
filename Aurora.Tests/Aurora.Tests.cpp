@@ -8,10 +8,10 @@ using namespace Aurora;
 #include <Windows.h>
 
 int main() {
-	// printf("\x1B[38;2;255;0;0mtest\n");
-	// printf("Another test\n");
+	printf("\x1B[38;2;255;0;0mGay\n");
+	printf("\x1B[38;2;0;0;255mGay\n");
 
-	RGB rgb(255, 200, 255);
-	printf("%s\n", rgb.ToString().GetCString());
-	printf("%s\n", rgb.ToHSL().ToString().GetCString());
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED);
+
+	printf("Gay\n");
 }

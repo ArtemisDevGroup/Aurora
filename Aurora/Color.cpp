@@ -36,9 +36,7 @@ namespace Aurora {
 		return ret;
 	}
 
-	RGBA RGB::ToRGBA() const {
-		return RGBA(uR, uG, uB, 255);
-	}
+	RGBA RGB::ToRGBA() const { return RGBA(uR, uG, uB, 255); }
 
 	HSL RGB::ToHSL() const {
 		A_FL32 fR = static_cast<A_FL32>(uR);
