@@ -11,11 +11,11 @@ namespace Aurora {
 		Integral
 	};
 
-	class RGBA;
-	class HSL;
-	class HEX;
+	class AURORA_API RGBA;
+	class AURORA_API HSL;
+	class AURORA_API HEX;
 
-	class RGB {
+	class AURORA_API RGB {
 	public:
 		A_U8 uR, uG, uB;
 
@@ -29,7 +29,7 @@ namespace Aurora {
 		HEX ToHex() const;
 	};
 
-	class RGBA {
+	class AURORA_API RGBA {
 	public:
 		A_U8 uR, uG, uB, uA;
 
@@ -43,7 +43,7 @@ namespace Aurora {
 		HEX ToHex() const;
 	};
 
-	class HSL {
+	class AURORA_API HSL {
 	public:
 		A_U16 uHue;
 		A_FL32 fSaturation, fLightness, fAlpha;
@@ -57,7 +57,7 @@ namespace Aurora {
 		HEX ToHex() const;
 	};
 	
-	class HEX {
+	class AURORA_API HEX {
 		
 	};
 }

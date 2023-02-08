@@ -35,6 +35,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Color.cpp" />
+    <ClCompile Include="Console.cpp" />
     <ClCompile Include="Exceptions.cpp" />
     <ClCompile Include="Identification.cpp" />
     <ClCompile Include="String.cpp" />

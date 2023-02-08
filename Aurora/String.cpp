@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <varargs.h>
+#include <stdarg.h>
 
 namespace Aurora {
 	String::String() : lpString(nullptr), dwLength(0) {}
@@ -16,9 +16,16 @@ namespace Aurora {
 
 	A_VOID String::Clone(_Out_ A_LPVOID lpDestination) const {
 		String* pDst = (String*)lpDestination;
-		pDst->dwLength = dwLength;
-		pDst->lpString = new A_CHAR[dwLength + 1];
-		strcpy_s(pDst->lpString, dwLength + 1, lpString);
+
+		if (lpString) {
+			pDst->dwLength = dwLength;
+			pDst->lpString = new A_CHAR[dwLength + 1];
+			strcpy_s(pDst->lpString, dwLength + 1, lpString);
+		}
+		else {
+			pDst->dwLength = 0;
+			pDst->lpString = nullptr;
+		}
 	}
 
 	String::String(const String& cpy) { cpy.Clone(this); }
@@ -375,9 +382,11 @@ namespace Aurora {
 		A_CHAR szString[MAX_MSG];
 
 		va_list v;
-		va_start(v, lpString);
+		va_start(v, lpFormat);
 		vsprintf_s(szString, lpFormat, v);
 		va_end(v);
+
+		Add(szString, nIndex);
 	}
 
 	A_VOID String::Remove(_In_ A_I32 nCount, _In_ A_I32 nIndex) {

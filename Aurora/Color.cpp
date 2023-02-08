@@ -1,5 +1,12 @@
 #include "Color.h"
 
+#include <math.h>
+
+#define SQUARED(x) (x * x)
+#define HALF_OF(x) (x / static_cast<decltype(x)>(2))
+#define PI (A_FL32)(3.1415926f)
+#define RADIANS_TO_DEGREES(x) (x * 180 / PI)
+
 namespace Aurora {
 	RGB::RGB() : uR(0), uG(0), uB(0) {}
 
@@ -34,7 +41,22 @@ namespace Aurora {
 	}
 
 	HSL RGB::ToHSL() const {
-		return HSL();
+		A_FL32 fR = static_cast<A_FL32>(uR);
+		A_FL32 fG = static_cast<A_FL32>(uG);
+		A_FL32 fB = static_cast<A_FL32>(uB);
+
+		A_FL32 fMax = fmaxf(fmaxf(fR, fG), fB);
+		A_FL32 fMin = fminf(fminf(fR, fG), fB);
+		A_FL32 fDelta = (fMax - fMin) / 255.0f;
+
+		A_FL32 fLightness = (fMax + fMin) / 510.0f;
+		A_FL32 fSaturation = (fLightness > 0.0f) ? roundf((fDelta / (1 - fabsf(2 * fLightness - 1))) * 100.0f) / 100.0f : 0.0f;
+
+		A_FL32 fHue = roundf(RADIANS_TO_DEGREES(acosf((fR - HALF_OF(fG) - HALF_OF(fB)) / sqrtf(SQUARED(fR) + SQUARED(fG) + SQUARED(fB) - fR * fG - fR * fB - fG * fB))));
+
+		A_FL32 fHueFinal = fB > fG ? (360.0f - fHue) : fHue;
+
+		return HSL(static_cast<A_U16>(fHueFinal), fSaturation, fLightness);
 	}
 
 	HEX RGB::ToHex() const {
@@ -50,10 +72,14 @@ namespace Aurora {
 	HSL RGBA::ToHSL() const { return HSL(); }
 	HEX RGBA::ToHex() const { return HEX(); }
 
-	HSL::HSL() { }
-	HSL::HSL(_In_ A_U16 uHue, _In_ A_FL32 fSaturation, _In_ A_FL32 fLightness, _In_ A_FL32 fAlpha) { }
+	HSL::HSL() : uHue(0), fSaturation(0.0f), fLightness(0.0f), fAlpha(0.0f) {}
+	HSL::HSL(_In_ A_U16 uHue, _In_ A_FL32 fSaturation, _In_ A_FL32 fLightness, _In_ A_FL32 fAlpha) : uHue(uHue), fSaturation(fSaturation), fLightness(fLightness), fAlpha(fAlpha) {}
 
-	String HSL::ToString() const { return String(); }
+	String HSL::ToString() const {
+		String ret;
+		ret.AddFormat(-1, "hsl(%hu, %hhu%%, %hhu%%, %f)", uHue, static_cast<A_U8>(fSaturation * 100.0f), static_cast<A_U8>(fLightness * 100.0f), fAlpha);
+		return ret;
+	}
 	RGB HSL::ToRGB() const { return RGB(); }
 	RGBA HSL::ToRGBA() const { return RGBA(); }
 	HEX HSL::ToHex() const { return HEX(); }
