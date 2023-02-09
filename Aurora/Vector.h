@@ -242,7 +242,7 @@ namespace Aurora {
 	};
 
 	/// <summary>
-	/// A cvlass for storing for example quaternions or RGBA color.
+	/// A class for storing for example quaternions or RGBA color.
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
 	template<typename T = float>
