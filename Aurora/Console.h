@@ -6,8 +6,7 @@
 #include "String.h"
 #include "Exceptions.h"
 #include "Color.h"
-
-#include <Windows.h>
+#include "Enumerations.h"
 
 namespace Aurora {
 	class Console : public IDisposable {
@@ -26,7 +25,8 @@ namespace Aurora {
 	A_VOID AURORA_API SetConsoleBackgroundColor(_In_ const RGB& TrueColor);
 	A_VOID AURORA_API ResetConsoleBackgroundColor();
 
-	A_VOID AURORA_API SetConsoleColorLegacy(_In_ A_WORD wColor);
+	A_VOID AURORA_API SetConsoleForegroundColorLegacy(_In_ ConsoleColorLegacyFlags wColorFlags);
+	A_VOID AURORA_API SetConsoleBackgroundColorLegacy(_In_ ConsoleColorLegacyFlags wColorFlags);
 }
 
 #endif // !__AURORA_CONSOLE_H__

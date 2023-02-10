@@ -11,6 +11,5 @@ using namespace Aurora;
 #include <math.h>
 
 int main() {
-	SetConsoleForegroundColor(Colors::Pink);
-	printf("Sex");
+
 }
