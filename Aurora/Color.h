@@ -5,6 +5,8 @@
 #include "String.h"
 #include "Vector.h"
 
+#undef RGB
+
 namespace Aurora {
 	enum class ColorRepresentation {
 		Percent,

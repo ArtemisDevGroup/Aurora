@@ -1,7 +1,5 @@
 #include "Exceptions.h"
-
-#include <Windows.h>
-#undef GetMessage
+#include "Array.h"
 
 #define AURORA_CONTEXT_KEY_INVALID 0
 
@@ -9,28 +7,45 @@ namespace Aurora {
 	//------------------------------------------------------------------------>
 	// Identifiers
 	namespace Identifiers {
-		const Identifier WindowsApiExceptionId = Identifier::Create("WindowsApiException", sizeof(WindowsApiException));
+		AURORA_API const Identifier WindowsApiExceptionId = Identifier::Create("WindowsApiException", sizeof(WindowsApiException));
+		AURORA_API const Identifier ParameterInvalidExceptionId = Identifier::Create("ParameterInvalidException", sizeof(ParameterInvalidException));
+		AURORA_API const Identifier ErrnoExceptionId = Identifier::Create("ErrnoException", sizeof(ErrnoException));
 	}
 	//------------------------------------------------------------------------>
 	// GlobalExceptionContext
-	String g_ExceptionContext;
-	A_DWORD g_dwContextKey = AURORA_CONTEXT_KEY_INVALID;
-	A_BOOL g_bHasContext = false;
+	List<Pair<A_DWORD, List<String>>> g_ExceptionContextList;
 	//-----------------------------------
-	A_DWORD GlobalExceptionContext::SetContext(_In_ const String& Context) {
-		if (!g_bHasContext) {
-			g_ExceptionContext = Context;
-			g_bHasContext = true;
-			return g_dwContextKey++;
+	A_I32 IndexOf(_In_ A_DWORD dwThreadId) {
+		for (A_I32 i = 0; i < g_ExceptionContextList.size(); i++) {
+			if (g_ExceptionContextList[i].GetFirst() == dwThreadId) return i;
 		}
-		else return AURORA_CONTEXT_KEY_INVALID;
+		return INVALID_INDEX;
 	}
 	//-----------------------------------
-	String GlobalExceptionContext::GetContext() { return g_ExceptionContext; }
+	A_DWORD GlobalExceptionContext::SetContext(_In_ const String& Context) {
+		A_DWORD dwThreadId = GetCurrentThreadId();
+		A_I32 nIndex = IndexOf(dwThreadId);
+		if (nIndex == INVALID_INDEX) {
+			g_ExceptionContextList.Add({ dwThreadId, List<String>() });
+			g_ExceptionContextList[g_ExceptionContextList.size() - 1].GetSecond().Add(Context);
+			return dwThreadId;
+		}
+		else {
+			g_ExceptionContextList[nIndex].GetSecond().Add(Context);
+			return AURORA_CONTEXT_KEY_INVALID;
+		}
+	}
 	//-----------------------------------
-	A_DWORD GlobalExceptionContext::GetContextKey() { return g_dwContextKey; }
+	const List<String>& GlobalExceptionContext::GetContext() {
+		return g_ExceptionContextList[IndexOf(GetCurrentThreadId())].GetSecond();
+	}
 	//-----------------------------------
-	A_VOID GlobalExceptionContext::ResetContext(_In_ A_DWORD dwKey) { if (g_bHasContext && dwKey == g_dwContextKey) g_bHasContext = false; }
+	A_VOID GlobalExceptionContext::ResetContext(_In_ A_DWORD dwKey) {
+		A_I32 nIndex = IndexOf(dwKey);
+
+		if (nIndex != INVALID_INDEX)
+			g_ExceptionContextList.Remove(1, nIndex);
+	}
 	//------------------------------------------------------------------------>
 	// IException
 	IException::IException(_In_ const String& Message, _In_ const Identifier& Id) : Message(Message), Id(Id) {}
@@ -78,4 +93,18 @@ namespace Aurora {
 	constexpr const String& WindowsApiException::GetWindowsMessage() const { return WindowsApiMessage; }
 	//-----------------------------------
 	constexpr const String& WindowsApiException::GetWindowsFunction() const { return WindowsApiFunction; }
+	//------------------------------------------------------------------------>
+	// ParameterInvalidException
+	ParameterInvalidException::ParameterInvalidException(_In_ const String& ParameterName) : IException("", Identifiers::ParameterInvalidExceptionId), ParameterName(ParameterName) {}
+	//-----------------------------------
+	constexpr const String& ParameterInvalidException::GetParameterName() const { return ParameterName; }
+	//------------------------------------------------------------------------>
+	// ErrnoException
+	ErrnoException::ErrnoException(_In_ errno_t nErrorCode) : IException("A C standard function has failed.", Identifiers::ErrnoExceptionId), nErrorCode(nErrorCode)  {
+		strerror_s(szErrnoString, nErrorCode);
+	}
+	//-----------------------------------
+	constexpr errno_t ErrnoException::GetErrorCode() const { return nErrorCode; }
+	//-----------------------------------
+	constexpr A_LPCSTR ErrnoException::GetErrorMessage() const { return szErrnoString; }
 }

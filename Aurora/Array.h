@@ -18,8 +18,10 @@ namespace Aurora {
 		Pair() : Field1(), Field2() {}
 		Pair(_In_ Type1 First, _In_ Type2 Second) : Field1(First), Field2(Second) {}
 
-		constexpr Type1 GetFirst() const { return Field1; }
-		constexpr Type2 GetSecond() const { return Field2; }
+		constexpr const Type1& GetFirst() const { return Field1; }
+		constexpr Type1& GetFirst() { return Field1; }
+		constexpr const Type2& GetSecond() const { return Field2; }
+		constexpr Type2& GetSecond() { return Field2; }
 	};
 
 	/// <summary>

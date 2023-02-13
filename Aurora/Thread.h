@@ -3,24 +3,12 @@
 
 #include "Definitions.h"
 #include "Interfaces.h"
+#include "Exceptions.h"
+#include "Enumerations.h"
 
 #include <Windows.h>
 
 namespace Aurora {
-	class ExitCode {
-		A_DWORD dwCode;
-	public:
-		constexpr ExitCode(_In_ A_DWORD dwExitCode) : dwCode(dwExitCode) {}
-
-		static constexpr A_DWORD Success = 0;
-		static constexpr A_DWORD UnknownError = -1;
-		static constexpr A_DWORD Terminated = -2;
-
-		constexpr operator A_DWORD() const { return dwCode; }
-	};
-
-	enum class WaitResult : A_DWORD { Succeeded = WAIT_OBJECT_0, Abandoned = WAIT_ABANDONED, TimedOut = WAIT_TIMEOUT };
-
 	template<typename ArgumentType = void>
 	class Thread : public IDisposable {
 	public:
@@ -28,52 +16,71 @@ namespace Aurora {
 
 	private:
 		HANDLE hThread;
+		A_DWORD dwThreadId;
 
 		struct StaticThreadArgs {
 			ThreadFunction lpfnThread;
 			ArgumentType Args;
 		} ArgStruct;
 
-		static A_DWORD __stdcall StaticThread(_In_ StaticThreadArgs* pArgs) { return pArgs->lpfnThread(pArgs->Args); }
+		static A_DWORD __stdcall StaticThread(_In_ StaticThreadArgs* pArgs) { return (A_DWORD)pArgs->lpfnThread(pArgs->Args); }
 
 	public:
-		Thread(_In_ ThreadFunction lpfnThread, _In_ ArgumentType Args) : hThread(nullptr) {
+		Thread(_In_ ThreadFunction lpfnThread, _In_ ArgumentType Args) noexcept : hThread(nullptr), dwThreadId(0) {
 			ArgStruct.lpfnThread = lpfnThread;
 			ArgStruct.Args = Args;
 		}
 
 		A_VOID Start() {
+			AuroraContextStart();
+
 			hThread = CreateThread(
 				nullptr,
 				0,
 				(LPTHREAD_START_ROUTINE)StaticThread,
 				&ArgStruct,
 				0,
-				nullptr
+				&dwThreadId
 			);
 
-			if (!hThread) /* throw */;
+			if (!hThread) AuroraThrow(WindowsApiException, "CreateThread");
+
+			AuroraContextEnd();
 		}
 
 		WaitResult Wait(_In_ A_DWORD dwMilliseconds = INFINITE) const {
-			A_DWORD dwResult = WaitForSingleObject(hThread, dwMilliseconds);
-			if (dwResult == WAIT_FAILED) /* throw */;
+			AuroraContextStart();
 
+			A_DWORD dwResult = WaitForSingleObject(hThread, dwMilliseconds);
+			if (dwResult == WAIT_FAILED) AuroraThrow(WindowsApiException, "WaitForSingleObject");
+
+			AuroraContextEnd();
 			return (WaitResult)dwResult;
 		}
 
 		ExitCode GetExitCode() const {
-			A_DWORD dwResult;
-			if (!GetExitCodeThread(hThread, &dwResult)) /* throw */;
+			AuroraContextStart();
 
-			return ExitCode(dwResult);
+			A_DWORD dwResult;
+			if (!GetExitCodeThread(hThread, &dwResult)) AuroraThrow(WindowsApiException, "GetExitCodeThread");
+
+			AuroraContextEnd();
+			return (ExitCode)dwResult;
 		}
 
+		constexpr A_DWORD GetThreadId() const noexcept { return dwThreadId; }
+
 		A_VOID Terminate() const {
-			if (!TerminateThread(hThread, ExitCode::Terminated)) /* throw */;
+			AuroraContextStart();
+
+			if (!TerminateThread(hThread, (A_DWORD)ExitCode::Terminated)) AuroraThrow(WindowsApiException, "TerminateThread");
+
+			AuroraContextEnd();
 		}
 
 		A_VOID IDisposable::Clone(_Out_ void* pDestination) const {
+			AuroraContextStart();
+
 			Thread<ArgumentType>* pDst = (Thread<ArgumentType>*)pDestination;
 			pDst->ArgStruct = ArgStruct;
 
@@ -85,7 +92,9 @@ namespace Aurora {
 				0,
 				FALSE,
 				DUPLICATE_SAME_ACCESS
-			)) /* throw */;
+			)) AuroraThrow(WindowsApiException, "DuplicateHandle");
+
+			AuroraContextEnd();
 		}
 
 		Thread(const Thread<ArgumentType>& cpy) { cpy.Clone(this); }
@@ -108,44 +117,63 @@ namespace Aurora {
 	private:
 		ThreadFunction lpfnThread;
 		HANDLE hThread;
+		A_DWORD dwThreadId;
 
-		static A_DWORD __stdcall StaticThread(_In_ ThreadFunction lpfnThread) { return lpfnThread(); }
+		static A_DWORD __stdcall StaticThread(_In_ ThreadFunction lpfnThread) { return (A_DWORD)lpfnThread(); }
 
 	public:
-		Thread(_In_ ThreadFunction lpfnThread) : lpfnThread(lpfnThread), hThread(nullptr) {}
+		Thread(_In_ ThreadFunction lpfnThread) noexcept : lpfnThread(lpfnThread), hThread(nullptr), dwThreadId(0) {}
 
 		A_VOID Start() {
+			AuroraContextStart();
+
 			hThread = CreateThread(
 				nullptr,
 				0,
 				(LPTHREAD_START_ROUTINE)StaticThread,
 				lpfnThread,
 				0,
-				nullptr
+				&dwThreadId
 			);
 
-			if (!hThread) /* throw */;
+			if (!hThread) AuroraThrow(WindowsApiException, "CreateThread");
+
+			AuroraContextEnd();
 		}
 
 		WaitResult Wait(_In_ A_DWORD dwMilliseconds = INFINITE) const {
-			A_DWORD dwResult = WaitForSingleObject(hThread, dwMilliseconds);
-			if (dwResult == WAIT_FAILED) /* throw */;
+			AuroraContextStart();
 
+			A_DWORD dwResult = WaitForSingleObject(hThread, dwMilliseconds);
+			if (dwResult == WAIT_FAILED) AuroraThrow(WindowsApiException, "WaitForSingleObject");
+
+			AuroraContextEnd();
 			return (WaitResult)dwResult;
 		}
 
 		ExitCode GetExitCode() const {
-			A_DWORD dwResult;
-			if (!GetExitCodeThread(hThread, &dwResult)) /* throw */;
+			AuroraContextStart();
 
-			return ExitCode(dwResult);
+			A_DWORD dwResult;
+			if (!GetExitCodeThread(hThread, &dwResult)) AuroraThrow(WindowsApiException, "GetExitCodeThread");
+
+			AuroraContextEnd();
+			return (ExitCode)dwResult;
 		}
 
+		constexpr A_DWORD GetThreadId() const noexcept { return dwThreadId; }
+
 		A_VOID Terminate() const {
-			if (!TerminateThread(hThread, ExitCode::Terminated)) /* throw */;
+			AuroraContextStart();
+
+			if (!TerminateThread(hThread, (A_DWORD)ExitCode::Terminated)) AuroraThrow(WindowsApiException, "TerminateThread");
+
+			AuroraContextEnd();
 		}
 
 		A_VOID IDisposable::Clone(_Out_ void* pDestination) const {
+			AuroraContextStart();
+
 			Thread<>* pDst = (Thread<>*)pDestination;
 			pDst->lpfnThread = lpfnThread;
 
@@ -157,7 +185,9 @@ namespace Aurora {
 				0,
 				FALSE,
 				DUPLICATE_SAME_ACCESS
-			)) /* throw */;
+			)) AuroraThrow(WindowsApiException, "DuplicateHandle");
+
+			AuroraContextEnd();
 		}
 
 		Thread(const Thread<>& cpy) { cpy.Clone(this); }

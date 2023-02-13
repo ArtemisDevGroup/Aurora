@@ -8,8 +8,6 @@ using namespace Aurora;
 
 #include <Windows.h>
 
-#include <math.h>
-
 int main() {
 
 }

@@ -55,6 +55,8 @@
 #define MAX_INVOKE 64
 #endif // !MAX_INVOKE
 
+#define INVALID_INDEX (-1) // An invalid index.
+
 #define A_VOID void
 
 // A void pointer. Generally used as an out pointer of a generic type. Is prefixed as 'lp'.

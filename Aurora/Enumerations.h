@@ -9,35 +9,47 @@ namespace Aurora {
 	/// <para>This is used as a return value for the compare routine of the collection classes.</para>
 	/// <para>See guides or the API reference for usage examples.</para>
 	/// </summary>
-	struct CompareResult {
-	private:
-		typedef A_I32 EnumSize;
-
-		EnumSize nValue;
-
-	public:
-		enum Enum : EnumSize {
-			/// <summary>
+	enum class CompareResult : A_I32 {
+		/// <summary>
 			/// Element 1 is less than element 2.
 			/// </summary>
-			LessThan = -1,
+		LessThan = -1,
 
-			/// <summary>
-			/// Element 1 and element 2 are equal.
-			/// </summary>
-			Equal = 0,
+		/// <summary>
+		/// Element 1 and element 2 are equal.
+		/// </summary>
+		Equal = 0,
 
-			/// <summary>
-			/// Element 1 is more than element 2.
-			/// </summary>
-			MoreThan = 1
-		};
+		/// <summary>
+		/// Element 1 is more than element 2.
+		/// </summary>
+		MoreThan = 1
+	};
 
-		constexpr CompareResult() : nValue(0) {}
-		constexpr CompareResult(_In_ EnumSize nValue) : nValue(nValue) {}
-		constexpr CompareResult(_In_ Enum nValue) : nValue((EnumSize)nValue) {}
+	enum class CharacterRepresentation : A_I32 {
+		None = 0,
+		ANSI = 1,
+		UTF_16LE = 2
+	};
 
-		constexpr operator Enum() const { return (Enum)nValue; }
+	/// <summary>
+	/// Represents a standard data stream.
+	/// </summary>
+	enum class StandardStream {
+		Out,	// The stdout stream.
+		In		// The stdin stream.
+	};
+
+	enum class ExitCode : A_DWORD {
+		Success = 0,
+		UnknownError = (A_DWORD)(-1),
+		Terminated = (A_DWORD)(-2)
+	};
+
+	enum class WaitResult : A_DWORD {
+		Succeeded = 0,
+		Abandoned = 0x80,
+		TimedOut = 258
 	};
 
 	struct IntegralRepresentationFlags {
@@ -60,12 +72,6 @@ namespace Aurora {
 		constexpr IntegralRepresentationFlags(_In_ Enum nValue) : nValue((EnumSize)nValue) {}
 
 		constexpr operator Enum() const { return (Enum)nValue; }
-	};
-
-	enum class CharacterRepresentation : A_I32 {
-		None = 0,
-		ANSI = 1,
-		UTF_16LE = 2
 	};
 
 	struct ConsoleColorLegacyFlags {
