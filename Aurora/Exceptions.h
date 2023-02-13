@@ -3,10 +3,8 @@
 
 #include "Definitions.h"
 #include "Identification.h"
-#include "String.h"
 
 #include <string.h>
-
 #include <Windows.h>
 #undef GetMessage
 
@@ -20,12 +18,17 @@
 // Throws an exception inside of a contextualized call.
 #define AuroraThrow(Exception, ...) throw Exception(__VA_ARGS__).WithContext(__FUNCTION__, __FILE__, __LINE__)
 
+#define MAX_CALL_TRACE 64
+
 namespace Aurora {
 	namespace Identifiers {
 		AURORA_API extern const Identifier WindowsApiExceptionId;
 		AURORA_API extern const Identifier ParameterInvalidExceptionId;
 		AURORA_API extern const Identifier ErrnoExceptionId;
+		AURORA_API extern const Identifier IndexOutOfBoundsExceptionid;
 	}
+
+	typedef const A_CHAR(*FunctionsArray)[MAX_NAME];
 
 	class AURORA_API GlobalExceptionContext {
 	public:
@@ -33,74 +36,78 @@ namespace Aurora {
 		GlobalExceptionContext(const GlobalExceptionContext&) = delete;
 		~GlobalExceptionContext() = delete;
 
-		static A_DWORD SetContext(_In_ const String& Context);
-		static const List<String>& GetContext();
-		static A_VOID ResetContext(_In_ A_DWORD dwKey);
+		static _Check_return_ A_DWORD SetContext(_In_z_ A_LPCSTR lpContext);
+		static _Check_return_ _Ret_maybenull_ FunctionsArray GetContext() noexcept;
+		static _Check_return_ A_I32 GetContextCount() noexcept;
+		static A_VOID ResetContext(_In_ A_DWORD dwKey) noexcept;
 	};
 
 	class AURORA_API IException {
-		String Message;
+		A_CHAR szMessage[MAX_MSG];
 		Identifier Id;
 
 	public:
-		IException(_In_ const String& Message, _In_ const Identifier& Id);
+		IException(_In_z_ A_LPCSTR lpMessage, _In_ const Identifier& Id);
 
-		constexpr const String& GetMessage() const;
-		constexpr const Identifier& GetIdentifier() const;
+		constexpr _Check_return_ _Ret_z_ A_LPCSTR GetMessage() const noexcept;
+		constexpr _Check_return_ const Identifier& GetIdentifier() const noexcept;
 
 		A_BOOL operator==(const IException&) const;
-		constexpr A_BOOL operator==(const Identifier&) const;
-		A_BOOL operator==(const String&) const;
+		constexpr A_BOOL operator==(const Identifier&) const noexcept;
+		A_BOOL operator==(_In_z_ A_LPCSTR) const;
 
 		A_BOOL operator!=(const IException&) const;
-		constexpr A_BOOL operator!=(const Identifier&) const;
-		A_BOOL operator!=(const String&) const;
+		constexpr A_BOOL operator!=(const Identifier&) const noexcept;
+		A_BOOL operator!=(_In_z_ A_LPCSTR) const;
 	};
 
 	template<class Derived>
 	class AURORA_API IExceptionContext {
-		List<String> Functions;
-		String CoreFunction;
-		String FilePath;
+		A_CHAR lpszFunctions[MAX_CALL_TRACE][MAX_NAME];
+		A_CHAR szCoreFunction[MAX_NAME];
+		A_CHAR szFilePath[MAX_PATH];
+		A_I32 nFunctionsIndex;
 		A_I32 nLine;
 
 	public:
-		inline IExceptionContext() : Functions(), CoreFunction(), FilePath(), nLine(0) {}
+		inline IExceptionContext() : lpszFunctions(), szCoreFunction(), szFilePath(), nFunctionsIndex(0), nLine(0) {}
 
-		inline Derived WithContext(_In_ const String& Function, _In_ const String& File, _In_ A_I32 nLine) {
-			this->Functions = GlobalExceptionContext::GetContext();
+		inline Derived WithContext(_In_z_ A_LPCSTR lpFunction, _In_z_ A_LPCSTR lpFile, _In_ A_I32 nLine) {
+			for (A_I32 i = 0; i < GlobalExceptionContext::GetContextCount(); i++)
+				strcpy_s(lpszFunctions[i], GlobalExceptionContext::GetContext()[i]);
 			GlobalExceptionContext::ResetContext(GetCurrentThreadId());
 
-			this->CoreFunction = Function;
-			this->FilePath = File;
+			strcpy_s(szCoreFunction, lpFunction);
+			strcpy_s(szFilePath, lpFile);
 			this->nLine = nLine;
 			return *(Derived*)this;
 		}
 
-		constexpr const List<String>& GetFunctions() const { return Functions; }
-		constexpr const String& GetCoreFunction() const { return CoreFunction; }
-		constexpr const String& GetFile() const { return FilePath; }
-		constexpr A_I32 GetLine() const { return nLine; }
+		constexpr FunctionsArray GetFunctions() const { return lpszFunctions; }
+		constexpr _Check_return_ A_I32 GetFunctionCount() const { return nFunctionsIndex; }
+		constexpr _Check_return_ _Ret_z_ A_LPCSTR GetCoreFunction() const { return szCoreFunction; }
+		constexpr _Check_return_ _Ret_z_ A_LPCSTR GetFile() const { return szFilePath; }
+		constexpr _Check_return_ A_I32 GetLine() const { return nLine; }
 	};
 
 	class WindowsApiException : public IException, public IExceptionContext<WindowsApiException> {
 		A_DWORD dwWindowsApiCode;
-		String WindowsApiMessage;
-		String WindowsApiFunction;
+		A_CHAR szWindowsApiMessage[MAX_MSG];
+		A_CHAR szWindowsApiFunction[MAX_NAME];
 
 	public:
-		WindowsApiException(_In_ const String& WindowsApiFunction);
-		constexpr A_DWORD GetWindowsCode() const;
-		constexpr const String& GetWindowsMessage() const;
-		constexpr const String& GetWindowsFunction() const;
+		WindowsApiException(_In_z_ A_LPCSTR lpWindowsApiFunction);
+		constexpr _Check_return_ A_DWORD GetWindowsCode() const noexcept;
+		constexpr _Check_return_ _Ret_z_ A_LPCSTR GetWindowsMessage() const noexcept;
+		constexpr _Check_return_ _Ret_z_ A_LPCSTR GetWindowsFunction() const noexcept;
 	};
 
 	class ParameterInvalidException : public IException, public IExceptionContext<ParameterInvalidException> {
-		String ParameterName;
+		A_CHAR szParameterName[MAX_NAME];
 
 	public:
-		ParameterInvalidException(_In_ const String& ParameterName);
-		constexpr const String& GetParameterName() const;
+		ParameterInvalidException(_In_z_ A_LPCSTR lpParameterName);
+		constexpr _Check_return_ _Ret_z_ A_LPCSTR GetParameterName() const noexcept;
 	};
 
 	class ErrnoException : public IException, public IExceptionContext<ParameterInvalidException> {
@@ -109,8 +116,18 @@ namespace Aurora {
 
 	public:
 		ErrnoException(_In_ errno_t nErrorCode);
-		constexpr errno_t GetErrorCode() const;
-		constexpr A_LPCSTR GetErrorMessage() const;
+		constexpr _Check_return_ errno_t GetErrorCode() const noexcept;
+		constexpr _Check_return_ _Ret_z_ A_LPCSTR GetErrorMessage() const noexcept;
+	};
+
+	class IndexOutOfBoundsException : public IException, public IExceptionContext<IndexOutOfBoundsException> {
+		A_I32 nIndex;
+		A_I32 nMaxValidIndex;
+
+	public:
+		IndexOutOfBoundsException(_In_ A_I32 nIndex, _In_ A_I32 nHighestValidIndex);
+		constexpr _Check_return_ A_I32 GetIndex() const noexcept;
+		constexpr _Check_return_ A_I32 GetHighestValidIndex() const noexcept;
 	};
 }
 

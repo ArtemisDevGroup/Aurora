@@ -7,6 +7,7 @@
 #include "Definitions.h"
 #include "Enumerations.h"
 #include "Interfaces.h"
+#include "Exceptions.h"
 
 namespace Aurora {
 	template<typename Type1, typename Type2>
@@ -124,6 +125,8 @@ namespace Aurora {
 		}
 
 		inline A_VOID Move(_In_ A_I32 nFrom, _In_ A_I32 nTo) {
+			AuroraContextStart();
+
 			if (nFrom > nTo) {
 				for (A_I32 i = 0; i < this->nCount - nFrom; i++) pArray[nTo + i] = pArray[nFrom + i];
 			}
@@ -131,7 +134,9 @@ namespace Aurora {
 				for (A_I32 i = this->nCount - 1; i >= nFrom; i--)
 					pArray[nTo - nFrom + i] = pArray[i];
 			}
-			else /* throw */;
+			else AuroraThrow(ParameterInvalidException, "nFrom == nTo");
+
+			AuroraContextEnd();
 		}
 
 	public:

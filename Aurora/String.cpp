@@ -495,6 +495,8 @@ namespace Aurora {
 
 			if (bFound) return i;
 		}
+
+		return INVALID_INDEX;
 	}
 
 	List<A_I32> String::Find(_In_ const String& str) const {

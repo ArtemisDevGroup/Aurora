@@ -1,7 +1,8 @@
 #include "Exceptions.h"
-#include "Array.h"
 
 #define AURORA_CONTEXT_KEY_INVALID 0
+
+#define MAX_THREADCOUNT 64
 
 namespace Aurora {
 	//------------------------------------------------------------------------>
@@ -10,101 +11,149 @@ namespace Aurora {
 		AURORA_API const Identifier WindowsApiExceptionId = Identifier::Create("WindowsApiException", sizeof(WindowsApiException));
 		AURORA_API const Identifier ParameterInvalidExceptionId = Identifier::Create("ParameterInvalidException", sizeof(ParameterInvalidException));
 		AURORA_API const Identifier ErrnoExceptionId = Identifier::Create("ErrnoException", sizeof(ErrnoException));
+		AURORA_API const Identifier IndexOutOfBoundsExceptionId = Identifier::Create("IndexOutOfBoundsException", sizeof(IndexOutOfBoundsException));
 	}
 	//------------------------------------------------------------------------>
 	// GlobalExceptionContext
-	List<Pair<A_DWORD, List<String>>> g_ExceptionContextList;
+	A_CHAR g_szExceptionContextList[MAX_THREADCOUNT][MAX_CALL_TRACE][MAX_NAME];
+	A_DWORD g_szdwThreadIds[MAX_THREADCOUNT];
+	A_BOOL g_szbIndexIsTaken[MAX_THREADCOUNT];
+	A_I32 g_sznTraceIndex[MAX_THREADCOUNT];
 	//-----------------------------------
-	A_I32 IndexOf(_In_ A_DWORD dwThreadId) {
-		for (A_I32 i = 0; i < g_ExceptionContextList.size(); i++) {
-			if (g_ExceptionContextList[i].GetFirst() == dwThreadId) return i;
+	A_I32 GetIndexOf(_In_ A_DWORD dwThreadId) {
+		for (A_I32 i = 0; i < MAX_THREADCOUNT; i++) {
+			if (g_szbIndexIsTaken[i] && g_szdwThreadIds[i] == dwThreadId) return i;
 		}
 		return INVALID_INDEX;
 	}
 	//-----------------------------------
-	A_DWORD GlobalExceptionContext::SetContext(_In_ const String& Context) {
+	A_I32 GetNextFreeIndex() {
+		for (A_I32 i = 0; i < MAX_THREADCOUNT; i++)
+			if (!g_szbIndexIsTaken[i]) return i;
+		return INVALID_INDEX;
+	}
+	//-----------------------------------
+	A_VOID AllocateIndex(_In_ A_I32 nIndex, _In_ A_DWORD dwThreadId) {
+		g_szbIndexIsTaken[nIndex] = true;
+		g_szdwThreadIds[nIndex] = dwThreadId;
+		g_sznTraceIndex[nIndex] = 0;
+	}
+	//-----------------------------------
+	A_VOID ReleaseIndex(_In_ A_I32 nIndex) {
+		g_szbIndexIsTaken[nIndex] = false;
+		g_szdwThreadIds[nIndex] = 0;
+		g_sznTraceIndex[nIndex] = 0;
+	}
+	//-----------------------------------
+	A_VOID AddTraceToIndex(_In_ A_I32 nIndex, _In_z_ A_LPCSTR lpTrace) {
+		if (g_szbIndexIsTaken[nIndex]) {
+			strcpy_s(g_szExceptionContextList[nIndex][g_sznTraceIndex[nIndex]], lpTrace);
+			g_sznTraceIndex[nIndex]++;
+		}
+	}
+	//-----------------------------------
+	_Check_return_ A_DWORD GlobalExceptionContext::SetContext(_In_z_ A_LPCSTR lpContext) {
 		A_DWORD dwThreadId = GetCurrentThreadId();
-		A_I32 nIndex = IndexOf(dwThreadId);
+		A_I32 nIndex = GetIndexOf(dwThreadId);
+	
 		if (nIndex == INVALID_INDEX) {
-			g_ExceptionContextList.Add({ dwThreadId, List<String>() });
-			g_ExceptionContextList[g_ExceptionContextList.size() - 1].GetSecond().Add(Context);
+			nIndex = GetNextFreeIndex();
+			AllocateIndex(nIndex, dwThreadId);
+			AddTraceToIndex(nIndex, lpContext);
 			return dwThreadId;
 		}
 		else {
-			g_ExceptionContextList[nIndex].GetSecond().Add(Context);
+			AddTraceToIndex(nIndex, lpContext);
 			return AURORA_CONTEXT_KEY_INVALID;
 		}
 	}
 	//-----------------------------------
-	const List<String>& GlobalExceptionContext::GetContext() {
-		return g_ExceptionContextList[IndexOf(GetCurrentThreadId())].GetSecond();
-	}
-	//-----------------------------------
-	A_VOID GlobalExceptionContext::ResetContext(_In_ A_DWORD dwKey) {
-		A_I32 nIndex = IndexOf(dwKey);
+	_Check_return_ _Ret_maybenull_ FunctionsArray GlobalExceptionContext::GetContext() noexcept {
+		A_I32 nIndex = GetIndexOf(GetCurrentThreadId());
 
 		if (nIndex != INVALID_INDEX)
-			g_ExceptionContextList.Remove(1, nIndex);
+			return g_szExceptionContextList[nIndex];
+		else return nullptr;
+	}
+	//-----------------------------------
+	_Check_return_ A_I32 GlobalExceptionContext::GetContextCount() noexcept {
+		A_I32 nIndex = GetIndexOf(GetCurrentThreadId());
+		if (nIndex != INVALID_INDEX)
+			return g_sznTraceIndex[nIndex];
+		else return INVALID_INDEX;
+	}
+	//-----------------------------------
+	A_VOID GlobalExceptionContext::ResetContext(_In_ A_DWORD dwKey) noexcept {
+		A_I32 nIndex = GetIndexOf(dwKey);
+		if (nIndex != INVALID_INDEX)
+			ReleaseIndex(nIndex);
 	}
 	//------------------------------------------------------------------------>
 	// IException
-	IException::IException(_In_ const String& Message, _In_ const Identifier& Id) : Message(Message), Id(Id) {}
-	//-----------------------------------
-	constexpr const String& IException::GetMessage() const { return Message; }
-	//-----------------------------------
-	constexpr const Identifier& IException::GetIdentifier() const { return Id; }
-	//-----------------------------------
-	A_BOOL IException::operator==(const IException& operand) const {
-		return Message == operand.Message && Id == operand.Id;
+	IException::IException(_In_z_ A_LPCSTR lpMessage, _In_ const Identifier& Id) : Id(Id) {
+		strcpy_s(szMessage, lpMessage);
 	}
 	//-----------------------------------
-	constexpr A_BOOL IException::operator==(const Identifier& operand) const {
+	constexpr _Check_return_ _Ret_z_ A_LPCSTR IException::GetMessage() const noexcept { return szMessage; }
+	//-----------------------------------
+	constexpr _Check_return_ const Identifier& IException::GetIdentifier() const noexcept { return Id; }
+	//-----------------------------------
+	A_BOOL IException::operator==(const IException& operand) const {
+		return !(strcmp(szMessage, operand.szMessage)) && Id == operand.Id;
+	}
+	//-----------------------------------
+	constexpr A_BOOL IException::operator==(const Identifier& operand) const noexcept {
 		return Id == operand;
 	}
 	//-----------------------------------
-	A_BOOL IException::operator==(const String& operand) const {
-		return Message == operand;
+	A_BOOL IException::operator==(_In_z_ A_LPCSTR lpMessage) const {
+		return !(strcmp(szMessage, lpMessage));
 	}
 	//-----------------------------------
 	A_BOOL IException::operator!=(const IException& operand) const {
-		return Message != operand.Message || Id != operand.Id;
+		return !!(strcmp(szMessage, operand.szMessage)) || Id != operand.Id;
 	}
 	//-----------------------------------
-	constexpr A_BOOL IException::operator!=(const Identifier& operand) const {
+	constexpr A_BOOL IException::operator!=(const Identifier& operand) const noexcept {
 		return Id != operand;
 	}
 	//-----------------------------------
-	A_BOOL IException::operator!=(const String& operand) const {
-		return Message != operand;
+	A_BOOL IException::operator!=(_In_z_ A_LPCSTR lpMessage) const {
+		return !!(strcmp(szMessage, lpMessage));
 	}
 	//------------------------------------------------------------------------>
 	// WindowsApiException
-	WindowsApiException::WindowsApiException(_In_ const String& WindowsApiFunction) : IException("A Windows API call failed.", Identifiers::WindowsApiExceptionId), WindowsApiFunction(WindowsApiFunction) {
+	WindowsApiException::WindowsApiException(_In_z_ A_LPCSTR lpWindowsApiFunction) : IException("A Windows API call failed.", Identifiers::WindowsApiExceptionId) {
+		strcpy_s(szWindowsApiFunction, lpWindowsApiFunction);
+
 		dwWindowsApiCode = GetLastError();
-
-		A_CHAR szMessageBuffer[MAX_MSG];
-		FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, dwWindowsApiCode, LANG_SYSTEM_DEFAULT, szMessageBuffer, MAX_MSG, nullptr);
-
-		WindowsApiMessage = szMessageBuffer;
+		FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, dwWindowsApiCode, LANG_SYSTEM_DEFAULT, szWindowsApiMessage, MAX_MSG, nullptr);
 	}
 	//-----------------------------------
-	constexpr A_DWORD WindowsApiException::GetWindowsCode() const { return dwWindowsApiCode; }
+	constexpr _Check_return_ A_DWORD WindowsApiException::GetWindowsCode() const noexcept { return dwWindowsApiCode; }
 	//-----------------------------------
-	constexpr const String& WindowsApiException::GetWindowsMessage() const { return WindowsApiMessage; }
+	constexpr _Check_return_ _Ret_z_ A_LPCSTR WindowsApiException::GetWindowsMessage() const noexcept { return szWindowsApiMessage; }
 	//-----------------------------------
-	constexpr const String& WindowsApiException::GetWindowsFunction() const { return WindowsApiFunction; }
+	constexpr _Check_return_ _Ret_z_ A_LPCSTR WindowsApiException::GetWindowsFunction() const noexcept { return szWindowsApiFunction; }
 	//------------------------------------------------------------------------>
 	// ParameterInvalidException
-	ParameterInvalidException::ParameterInvalidException(_In_ const String& ParameterName) : IException("", Identifiers::ParameterInvalidExceptionId), ParameterName(ParameterName) {}
+	ParameterInvalidException::ParameterInvalidException(_In_z_ A_LPCSTR lpParameterName) : IException("A parameter was invalid.", Identifiers::ParameterInvalidExceptionId) { strcpy_s(szParameterName, lpParameterName); }
 	//-----------------------------------
-	constexpr const String& ParameterInvalidException::GetParameterName() const { return ParameterName; }
+	constexpr _Check_return_ _Ret_z_ A_LPCSTR ParameterInvalidException::GetParameterName() const noexcept { return szParameterName; }
 	//------------------------------------------------------------------------>
 	// ErrnoException
 	ErrnoException::ErrnoException(_In_ errno_t nErrorCode) : IException("A C standard function has failed.", Identifiers::ErrnoExceptionId), nErrorCode(nErrorCode)  {
 		strerror_s(szErrnoString, nErrorCode);
 	}
 	//-----------------------------------
-	constexpr errno_t ErrnoException::GetErrorCode() const { return nErrorCode; }
+	constexpr _Check_return_ errno_t ErrnoException::GetErrorCode() const noexcept { return nErrorCode; }
 	//-----------------------------------
-	constexpr A_LPCSTR ErrnoException::GetErrorMessage() const { return szErrnoString; }
+	constexpr _Check_return_ _Ret_z_ A_LPCSTR ErrnoException::GetErrorMessage() const noexcept { return szErrnoString; }
+	//------------------------------------------------------------------------>
+	// IndexOutOfBoundsException
+	IndexOutOfBoundsException::IndexOutOfBoundsException(_In_ A_I32 nIndex, _In_ A_I32 nHighestValidIndex) : IException("An index was out of array bounds.", Identifiers::IndexOutOfBoundsExceptionId), nIndex(nIndex), nMaxValidIndex(nHighestValidIndex) {}
+	//-----------------------------------
+	constexpr _Check_return_ A_I32 IndexOutOfBoundsException::GetIndex() const noexcept { return nIndex; }
+	//-----------------------------------
+	constexpr _Check_return_ A_I32 IndexOutOfBoundsException::GetHighestValidIndex() const noexcept { return nMaxValidIndex; }
 }
