@@ -12,11 +12,11 @@
 /// <para>Sets the context of all thrown exceptions to report the current function as the origin of the call.</para>
 /// <para>If this function is called inside an already contextualized call, this function will be added to the call trace.</para>
 /// </summary>
-#define AuroraContextStart() A_DWORD dwKey = Aurora::GlobalExceptionContext::SetContext(__FUNCTION__)
+#define AuroraContextStart() A_DWORD dwKey = Aurora::GlobalExceptionContext::SetContext(__FUNCSIG__)
 // Ends the contextualized call. Should be called right before returning.
 #define AuroraContextEnd() Aurora::GlobalExceptionContext::ResetContext(dwKey)
 // Throws an exception inside of a contextualized call.
-#define AuroraThrow(Exception, ...) throw Exception(__VA_ARGS__).WithContext(__FUNCTION__, __FILE__, __LINE__)
+#define AuroraThrow(Exception, ...) throw Exception(__VA_ARGS__).WithContext(__FUNCSIG__, __FILE__, __LINE__)
 
 #define MAX_CALL_TRACE 64
 
@@ -62,18 +62,19 @@ namespace Aurora {
 	};
 
 	template<class Derived>
-	class AURORA_API IExceptionContext {
+	class IExceptionContext {
 		A_CHAR lpszFunctions[MAX_CALL_TRACE][MAX_NAME];
 		A_CHAR szCoreFunction[MAX_NAME];
 		A_CHAR szFilePath[MAX_PATH];
-		A_I32 nFunctionsIndex;
+		A_I32 nFunctionCount;
 		A_I32 nLine;
 
 	public:
-		inline IExceptionContext() : lpszFunctions(), szCoreFunction(), szFilePath(), nFunctionsIndex(0), nLine(0) {}
+		inline IExceptionContext() : lpszFunctions(), szCoreFunction(), szFilePath(), nFunctionCount(0), nLine(0) {}
 
 		inline Derived WithContext(_In_z_ A_LPCSTR lpFunction, _In_z_ A_LPCSTR lpFile, _In_ A_I32 nLine) {
-			for (A_I32 i = 0; i < GlobalExceptionContext::GetContextCount(); i++)
+			nFunctionCount = GlobalExceptionContext::GetContextCount();
+			for (A_I32 i = 0; i < nFunctionCount; i++)
 				strcpy_s(lpszFunctions[i], GlobalExceptionContext::GetContext()[i]);
 			GlobalExceptionContext::ResetContext(GetCurrentThreadId());
 
@@ -84,13 +85,13 @@ namespace Aurora {
 		}
 
 		constexpr FunctionsArray GetFunctions() const { return lpszFunctions; }
-		constexpr _Check_return_ A_I32 GetFunctionCount() const { return nFunctionsIndex; }
+		constexpr _Check_return_ A_I32 GetFunctionCount() const { return nFunctionCount; }
 		constexpr _Check_return_ _Ret_z_ A_LPCSTR GetCoreFunction() const { return szCoreFunction; }
 		constexpr _Check_return_ _Ret_z_ A_LPCSTR GetFile() const { return szFilePath; }
 		constexpr _Check_return_ A_I32 GetLine() const { return nLine; }
 	};
 
-	class WindowsApiException : public IException, public IExceptionContext<WindowsApiException> {
+	class AURORA_API WindowsApiException : public IException, public IExceptionContext<WindowsApiException> {
 		A_DWORD dwWindowsApiCode;
 		A_CHAR szWindowsApiMessage[MAX_MSG];
 		A_CHAR szWindowsApiFunction[MAX_NAME];
@@ -102,7 +103,7 @@ namespace Aurora {
 		constexpr _Check_return_ _Ret_z_ A_LPCSTR GetWindowsFunction() const noexcept;
 	};
 
-	class ParameterInvalidException : public IException, public IExceptionContext<ParameterInvalidException> {
+	class AURORA_API ParameterInvalidException : public IException, public IExceptionContext<ParameterInvalidException> {
 		A_CHAR szParameterName[MAX_NAME];
 
 	public:
@@ -110,7 +111,7 @@ namespace Aurora {
 		constexpr _Check_return_ _Ret_z_ A_LPCSTR GetParameterName() const noexcept;
 	};
 
-	class ErrnoException : public IException, public IExceptionContext<ParameterInvalidException> {
+	class AURORA_API ErrnoException : public IException, public IExceptionContext<ParameterInvalidException> {
 		errno_t nErrorCode;
 		A_CHAR szErrnoString[MAX_MSG];
 
@@ -120,7 +121,7 @@ namespace Aurora {
 		constexpr _Check_return_ _Ret_z_ A_LPCSTR GetErrorMessage() const noexcept;
 	};
 
-	class IndexOutOfBoundsException : public IException, public IExceptionContext<IndexOutOfBoundsException> {
+	class AURORA_API IndexOutOfBoundsException : public IException, public IExceptionContext<IndexOutOfBoundsException> {
 		A_I32 nIndex;
 		A_I32 nMaxValidIndex;
 
