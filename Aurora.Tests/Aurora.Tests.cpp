@@ -5,7 +5,7 @@
 // All files:
 //		Add copyright and author notice to the top of every file.
 //		Inline document everything.
-// Array.h: Fix SAL and noexcept annotations.
+// Array.h: Fix SAL.
 // Binary.h: --||-- && add ROTL.
 // Color.h:	--||--
 // Console.h: --||-- && Finish decl and def of all functions.

@@ -19,10 +19,10 @@ namespace Aurora {
 		Pair() : Field1(), Field2() {}
 		Pair(_In_ Type1 First, _In_ Type2 Second) : Field1(First), Field2(Second) {}
 
-		constexpr const Type1& GetFirst() const { return Field1; }
-		constexpr Type1& GetFirst() { return Field1; }
-		constexpr const Type2& GetSecond() const { return Field2; }
-		constexpr Type2& GetSecond() { return Field2; }
+		constexpr const Type1& GetFirst() const noexcept { return Field1; }
+		constexpr Type1& GetFirst() noexcept { return Field1; }
+		constexpr const Type2& GetSecond() const noexcept { return Field2; }
+		constexpr Type2& GetSecond() noexcept { return Field2; }
 	};
 
 	/// <summary>
@@ -38,8 +38,8 @@ namespace Aurora {
 		/// </summary>
 		ElementType szArray[nElementCount];
 
-		inline operator ElementType* () { return szArray; }
-		constexpr operator const ElementType* () const { return szArray; }
+		inline operator ElementType* () noexcept { return szArray; }
+		constexpr operator const ElementType* () const noexcept { return szArray; }
 
 		inline ElementType& operator[](A_I32 nIndex) { return szArray[nIndex]; }
 		constexpr const ElementType operator[](A_I32 nIndex) const { return szArray[nIndex]; }
@@ -48,31 +48,31 @@ namespace Aurora {
 		/// Gets the size of the array and returns it.
 		/// </summary>
 		/// <returns>The size of the array.</returns>
-		constexpr _Check_return_ const A_I32 size() const { return nElementCount; }
+		constexpr _Check_return_ const A_I32 size() const noexcept { return nElementCount; }
 
 		/// <summary>
 		/// Gets the begin iterator.
 		/// </summary>
 		/// <returns>The begin iterator.</returns>
-		inline ElementType* begin() { return szArray; }
+		inline ElementType* begin() noexcept { return szArray; }
 
 		/// <summary>
 		/// Gets the begin const iterator.
 		/// </summary>
 		/// <returns>The begin const iterator.</returns>
-		constexpr const ElementType* begin() const { return szArray; }
+		constexpr const ElementType* begin() const noexcept { return szArray; }
 
 		/// <summary>
 		/// Ges the end iterator.
 		/// </summary>
 		/// <returns>The end iterator.</returns>
-		inline ElementType* end() { return &szArray[nElementCount]; }
+		inline ElementType* end() noexcept { return &szArray[nElementCount]; }
 
 		/// <summary>
 		/// Gets the end const iterator.
 		/// </summary>
 		/// <returns>The end const iterator.</returns>
-		constexpr const ElementType* end() const { return &szArray[nElementCount]; }
+		constexpr const ElementType* end() const noexcept { return &szArray[nElementCount]; }
 
 		/// <summary>
 		/// A function template for a function used to compare elements in this array and sort them accordingly.
@@ -96,10 +96,10 @@ namespace Aurora {
 
 		static const A_I32 c_nPageSize = 64;
 
-		static constexpr A_I32 ntob(A_I32 n) { return n * sizeof(ElementType); }
-		static constexpr A_I32 bton(A_I32 b) { return b / sizeof(ElementType); }
+		static constexpr A_I32 ntob(A_I32 n) noexcept { return n * sizeof(ElementType); }
+		static constexpr A_I32 bton(A_I32 b) noexcept { return b / sizeof(ElementType); }
 
-		static constexpr A_I32 GetRealAllocCount(A_I32 nCount) {
+		static constexpr A_I32 GetRealAllocCount(A_I32 nCount) noexcept {
 			return bton(c_nPageSize * (ntob(nCount) % c_nPageSize ? (ntob(nCount) / c_nPageSize + 1) : (ntob(nCount) / c_nPageSize)));
 		}
 
@@ -140,7 +140,7 @@ namespace Aurora {
 		}
 
 	public:
-		inline List() : IIterable<ElementType>(&pArray, &nMaxCount, &nCount), pArray(nullptr), nMaxCount(0), nCount(0) {}
+		inline List() noexcept : IIterable<ElementType>(&pArray, &nMaxCount, &nCount), pArray(nullptr), nMaxCount(0), nCount(0) {}
 
 		inline List(_In_ const std::initializer_list<ElementType>& list) : IIterable<ElementType>(&pArray, &nMaxCount, &nCount) {
 			Allocate(list.size());
@@ -256,16 +256,20 @@ namespace Aurora {
 
 		inline A_VOID Sort(_In_ CompareFunction lpfnCompareFunction) { qsort((void*)pArray, nCount, sizeof(ElementType), (_CoreCrtNonSecureSearchSortCompareFunction)lpfnCompareFunction); }
 
-		inline operator ElementType* () { return pArray; }
-		constexpr operator const ElementType* () const { return pArray; }
+		inline operator ElementType* () noexcept { return pArray; }
+		constexpr operator const ElementType* () const noexcept { return pArray; }
 
 		inline ElementType& operator[](A_I32 nIndex) {
-			if (nIndex >= nCount) /* throw */;
+			AuroraContextStart();
+			if (nIndex >= nCount) AuroraThrow(IndexOutOfBoundsException, nIndex, nCount - 1);
+			AuroraContextEnd();
 			return pArray[nIndex];
 		}
 
 		constexpr const ElementType operator[](A_I32 nIndex) const {
-			if (nIndex >= nCount) /* throw */;
+			AuroraContextStart();
+			if (nIndex >= nCount) AuroraThrow(IndexOutOfBoundsException, nIndex, nCount - 1);
+			AuroraContextEnd();
 			return pArray[nIndex];
 		}
 	};
@@ -276,7 +280,7 @@ namespace Aurora {
 		int nCount;
 
 	public:
-		inline ArgumentList() : IIterable<ElementType>(&pArray, &nCount), pArray(nullptr), nCount(0) {}
+		inline ArgumentList() noexcept : IIterable<ElementType>(&pArray, &nCount), pArray(nullptr), nCount(0) {}
 
 		inline ArgumentList(_In_ const std::initializer_list<ElementType>& list) : IIterable<ElementType>(&pArray, &nCount) {
 			nCount = list.size();
@@ -311,8 +315,8 @@ namespace Aurora {
 
 		inline ~ArgumentList() { Release(); }
 
-		inline operator ElementType* () { return pArray; }
-		constexpr operator const ElementType* () const { return pArray; }
+		inline operator ElementType* () noexcept { return pArray; }
+		constexpr operator const ElementType* () const noexcept { return pArray; }
 
 		inline ElementType& operator[](A_I32 nIndex) { return pArray[nIndex]; }
 		constexpr const ElementType operator[](A_I32 nIndex) const { return pArray[nIndex]; }
