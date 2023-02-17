@@ -67,11 +67,11 @@ namespace Aurora {
 			All = Binary | Octal | Decimal | Hexadecimal
 		};
 
-		constexpr IntegralRepresentationFlags() : nValue(0) {}
-		constexpr IntegralRepresentationFlags(_In_ EnumSize nValue) : nValue(nValue) {}
-		constexpr IntegralRepresentationFlags(_In_ Enum nValue) : nValue((EnumSize)nValue) {}
+		constexpr IntegralRepresentationFlags() noexcept : nValue(0) {}
+		constexpr IntegralRepresentationFlags(_In_ EnumSize nValue) noexcept : nValue(nValue) {}
+		constexpr IntegralRepresentationFlags(_In_ Enum nValue) noexcept : nValue((EnumSize)nValue) {}
 
-		constexpr operator Enum() const { return (Enum)nValue; }
+		constexpr operator Enum() const noexcept { return (Enum)nValue; }
 	};
 
 	struct ConsoleColorLegacyFlags {
@@ -104,14 +104,14 @@ namespace Aurora {
 			White = DarkRed | DarkGreen | DarkBlue | DarkGray,
 		};
 
-		constexpr ConsoleColorLegacyFlags() : nValue(0) {}
-		constexpr ConsoleColorLegacyFlags(_In_ EnumSize nValue) : nValue(nValue) {}
-		constexpr ConsoleColorLegacyFlags(_In_ Enum nValue) : nValue((EnumSize)nValue) {}
+		constexpr ConsoleColorLegacyFlags() noexcept : nValue(0) {}
+		constexpr ConsoleColorLegacyFlags(_In_ EnumSize nValue) noexcept : nValue(nValue) {}
+		constexpr ConsoleColorLegacyFlags(_In_ Enum nValue) noexcept : nValue((EnumSize)nValue) {}
 
-		constexpr EnumSize GetForegroundLiteral() const { return nValue; }
-		constexpr EnumSize GetBackgroundLiteral() const { return nValue << 4; }
+		constexpr EnumSize GetForegroundLiteral() const noexcept { return nValue; }
+		constexpr EnumSize GetBackgroundLiteral() const noexcept { return nValue << 4; }
 
-		constexpr operator Enum() const { return (Enum)nValue; }
+		constexpr operator Enum() const noexcept { return (Enum)nValue; }
 	};
 }
 

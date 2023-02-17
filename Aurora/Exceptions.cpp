@@ -84,9 +84,14 @@ namespace Aurora {
 	}
 	//-----------------------------------
 	A_VOID GlobalExceptionContext::ResetContext(_In_ A_DWORD dwKey) noexcept {
-		A_I32 nIndex = GetIndexOf(dwKey);
-		if (nIndex != INVALID_INDEX)
-			ReleaseIndex(nIndex);
+		if (dwKey == AURORA_CONTEXT_KEY_INVALID) {
+			// Pop stack trace
+		}
+		else {
+			A_I32 nIndex = GetIndexOf(dwKey);
+			if (nIndex != INVALID_INDEX)
+				ReleaseIndex(nIndex);
+		}
 	}
 	//------------------------------------------------------------------------>
 	// IException

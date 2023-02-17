@@ -13,7 +13,7 @@ namespace Aurora {
 		InstanceEventHandler lpszfnEventHandlers[MAX_INVOKE];
 
 	public:
-		constexpr Event() {
+		constexpr Event() noexcept {
 			for (int i = 0; i < MAX_INVOKE; i++) lpszfnEventHandlers[i] = nullptr;
 		}
 
@@ -23,13 +23,13 @@ namespace Aurora {
 					lpszfnEventHandlers[i](lpSender, pArgs);
 		}
 
-		constexpr A_VOID operator+=(_In_ InstanceEventHandler lpfnEventHandler) {
+		constexpr A_VOID operator+=(_In_ InstanceEventHandler lpfnEventHandler) noexcept {
 			for (A_I32 i = 0; i < MAX_INVOKE; i++)
 				if (!lpszfnEventHandlers[i])
 					lpszfnEventHandlers[i] = lpfnEventHandler;
 		}
 
-		constexpr A_VOID operator-=(_In_ InstanceEventHandler lpfnEventHandler) {
+		constexpr A_VOID operator-=(_In_ InstanceEventHandler lpfnEventHandler) noexcept {
 			for (A_I32 i = 0; i < MAX_INVOKE; i++)
 				if (lpszfnEventHandlers[i] == lpfnEventHandler)
 					lpszfnEventHandlers[i] = nullptr;

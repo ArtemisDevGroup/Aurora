@@ -41,13 +41,26 @@ namespace Aurora {
 		AuroraContextStart();
 
 		switch (Stream) {
-
+		case StandardStream::In:
+			if (g_pStdIn && fclose(g_pStdIn) == EOF) AuroraThrow(ErrnoException, errno);
+			break;
+		case StandardStream::Out:
+			if (g_pStdOut && fclose(g_pStdOut) == EOF) AuroraThrow(ErrnoException, errno);
+			break;
+		default:
+			AuroraThrow(ParameterInvalidException, "Stream");
+			break;
 		}
 
 		AuroraContextEnd();
 	}
 
-	A_VOID AURORA_API CloseAllStreams();
+	A_VOID AURORA_API CloseAllStreams() {
+		AuroraContextStart();
+		CloseStream(StandardStream::In);
+		CloseStream(StandardStream::Out);
+		AuroraContextEnd();
+	}
 
 	A_VOID AURORA_API SetConsoleForegroundColor(_In_ const RGB& TrueColor) {	
 		printf("\x1B[38;2;%hhu;%hhu;%hhum", TrueColor.uR, TrueColor.uG, TrueColor.uB);

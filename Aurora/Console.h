@@ -39,6 +39,12 @@ namespace Aurora {
 	/// <exception cref="ParameterInvalidException"/>
 	A_VOID AURORA_API CloseStream(_In_ StandardStream Stream);
 
+	/// <summary>
+	/// <para>Closes all opened standard streams from being used in console in or out operations.</para>
+	/// <para>If the standard stream was not manually opened, this function does nothing.</para>
+	/// </summary>
+	/// <exception cref="ErrnoException"/>
+	/// <exception cref="ParameterInvalidException"/>
 	A_VOID AURORA_API CloseAllStreams();
 
 	/// <summary>
@@ -47,9 +53,24 @@ namespace Aurora {
 	/// </summary>
 	/// <param name="TrueColor">- The color to set the foreground to, in RGB.</param>
 	A_VOID AURORA_API SetConsoleForegroundColor(_In_ const RGB& TrueColor);
+
+	/// <summary>
+	/// <para>Resets the foreground color of the console. This function only works with applications ran in a TrueColor enabled terminal.</para>
+	/// <para>For example: Windows Terminal is TrueColor enabled, whereas the Legacy Windows Command Prompt is not.</para>
+	/// </summary>
 	A_VOID AURORA_API ResetConsoleForegroundColor();
 
+	/// <summary>
+	/// <para>Sets the background color of the console. This function only works with applications ran in a TrueColor enabled terminal.</para>
+	/// <para>For example: Windows Terminal is TrueColor enabled, whereas the Legacy Windows Command Prompt is not.</para>
+	/// </summary>
+	/// <param name="TrueColor">- The color to set the foreground to, in RGB.</param>
 	A_VOID AURORA_API SetConsoleBackgroundColor(_In_ const RGB& TrueColor);
+
+	/// <summary>
+	/// <para>Resets the background color of the console. This function only works with applications ran in a TrueColor enabled terminal.</para>
+	/// <para>For example: Windows Terminal is TrueColor enabled, whereas the Legacy Windows Command Prompt is not.</para>
+	/// </summary>
 	A_VOID AURORA_API ResetConsoleBackgroundColor();
 
 	/// <summary>
