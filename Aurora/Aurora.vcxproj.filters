@@ -33,9 +33,6 @@
     <ClInclude Include="Interfaces.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="String.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Thread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -54,12 +51,12 @@
     <ClInclude Include="Vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Pipe.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Identification.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="String.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Exceptions.cpp">

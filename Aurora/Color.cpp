@@ -1,12 +1,13 @@
 #include "Color.h"
 
 #include <math.h>
+#include <stdio.h>
 
 #define PI (A_FL32)(3.1415926f)
 
-constexpr A_FL32 sq(A_FL32 x) { return x * x; }
-constexpr A_FL32 half(A_FL32 x) { return x / 2.0f; }
-constexpr A_FL32 radtodeg(A_FL32 x) { return x * 180.0f / PI; }
+constexpr A_FL32 sq(A_FL32 x) noexcept { return x * x; }
+constexpr A_FL32 half(A_FL32 x) noexcept { return x / 2.0f; }
+constexpr A_FL32 radtodeg(A_FL32 x) noexcept { return x * 180.0f / PI; }
 
 namespace Aurora {
 	namespace Colors {
@@ -172,10 +173,8 @@ namespace Aurora {
 		}
 	}
 
-	String RGB::ToString() const {
-		String ret;
-		ret.AddFormat(-1, "rgb(%hhu, %hhu, %hhu)", uR, uG, uB);
-		return ret;
+	A_VOID RGB::ToString(_Out_writes_z_(dwSize) A_LPSTR lpString, _In_ A_DWORD dwSize) const {
+		sprintf_s(lpString, dwSize, "rgb(%hhu, %hhu, %hhu)", uR, uG, uB);
 	}
 
 	RGBA RGB::ToRGBA() const { return RGBA(uR, uG, uB, 255); }
@@ -203,8 +202,8 @@ namespace Aurora {
 	RGBA::RGBA(_In_ A_U8 uR, _In_ A_U8 uG, _In_ A_U8 uB, _In_ A_U8 uA) : uR(uR), uG(uG), uB(uB), uA(uA) {}
 	RGBA::RGBA(_In_ const Vector4<>& v4Values, _In_ ColorRepresentation nRepresentation) { }
 
-	String RGBA::ToString() const {
-		return String();
+	A_VOID RGBA::ToString(_Out_writes_z_(dwSize) A_LPSTR lpString, _In_ A_DWORD dwSize) const {
+		sprintf_s(lpString, dwSize, "rgba(%hhu, %hhu, %hhu, %hhu)", uR, uG, uB, uA);
 	}
 
 	RGB RGBA::ToRGB() const { return RGB(uR, uG, uB); }
@@ -220,10 +219,8 @@ namespace Aurora {
 	HSL::HSL() : uHue(0), fSaturation(0.0f), fLightness(0.0f), fAlpha(0.0f) {}
 	HSL::HSL(_In_ A_U16 uHue, _In_ A_FL32 fSaturation, _In_ A_FL32 fLightness, _In_ A_FL32 fAlpha) : uHue(uHue), fSaturation(fSaturation), fLightness(fLightness), fAlpha(fAlpha) {}
 
-	String HSL::ToString() const {
-		String ret;
-		ret.AddFormat(-1, "hsl(%hu, %hhu%%, %hhu%%, %f)", uHue, static_cast<A_U8>(fSaturation * 100.0f), static_cast<A_U8>(fLightness * 100.0f), fAlpha);
-		return ret;
+	A_VOID HSL::ToString(_Out_writes_z_(dwSize) A_LPSTR lpString, _In_ A_DWORD dwSize) const {
+		sprintf_s(lpString, dwSize, "hsl(%hu, %hhu%%, %hhu%%, %f)", uHue, static_cast<A_U8>(fSaturation * 100.0f), static_cast<A_U8>(fLightness * 100.0f), fAlpha);
 	}
 
 	RGB HSL::ToRGB() const {
@@ -266,9 +263,9 @@ namespace Aurora {
 		else { fR = 0.f; fG = 0.f; fB = 0.f; }
 
 		return RGB(
-			static_cast<A_U16>(round((fR + fm) * 255.f)),
-			static_cast<A_U16>(round((fG + fm) * 255.f)),
-			static_cast<A_U16>(round((fB + fm) * 255.f))
+			static_cast<A_U8>(round((fR + fm) * 255.f)),
+			static_cast<A_U8>(round((fG + fm) * 255.f)),
+			static_cast<A_U8>(round((fB + fm) * 255.f))
 		);
 	}
 

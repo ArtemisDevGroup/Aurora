@@ -26,13 +26,14 @@ namespace Aurora {
 		static A_DWORD __stdcall StaticThread(_In_ StaticThreadArgs* pArgs) { return (A_DWORD)pArgs->lpfnThread(pArgs->Args); }
 
 	public:
-		Thread(_In_ ThreadFunction lpfnThread, _In_ ArgumentType Args) noexcept : hThread(nullptr), dwThreadId(0) {
+		Thread(_In_ ThreadFunction lpfnThread) noexcept : hThread(nullptr), dwThreadId(0) {
 			ArgStruct.lpfnThread = lpfnThread;
-			ArgStruct.Args = Args;
 		}
 
-		A_VOID Start() {
+		A_VOID Start(_In_ ArgumentType Args) {
 			AuroraContextStart();
+
+			ArgStruct.Args = Args;
 
 			hThread = CreateThread(
 				nullptr,

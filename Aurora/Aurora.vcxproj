@@ -29,7 +29,7 @@
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="Identification.h" />
     <ClInclude Include="Interfaces.h" />
-    <ClInclude Include="String.h" />
+    <ClInclude Include="Pipe.h" />
     <ClInclude Include="Thread.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>
@@ -38,7 +38,6 @@
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="Exceptions.cpp" />
     <ClCompile Include="Identification.cpp" />
-    <ClCompile Include="String.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

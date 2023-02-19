@@ -3,7 +3,6 @@
 
 #include "Definitions.h"
 #include "Interfaces.h"
-#include "String.h"
 #include "Exceptions.h"
 #include "Color.h"
 #include "Enumerations.h"
