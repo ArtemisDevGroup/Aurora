@@ -26,6 +26,24 @@
 // String.cpp: Fix everything.
 //------------------------
 
+#define DEFINE_ENUM_FLAGS(EnumName, EnumType, ...) \
+struct EnumName {\
+private:\
+	typedef EnumType EnumSize;\
+	EnumSize nValue;\
+public:\
+	enum Enum : EnumSize { __VA_ARGS__ };\
+	constexpr EnumName##() noexcept : nValue(0) {}\
+	constexpr EnumName##(_In_ EnumSize nValue) noexcept : nValue(nValue) {}\
+	constexpr EnumName##(_In_ Enum nValue) noexcept : nValue((EnumSize)nValue) {}\
+	constexpr operator Enum() const noexcept { return (Enum)nValue; }\
+}
+
+DEFINE_ENUM_FLAGS( TestFlags, int,
+	Test1,
+	Test2
+);
+
 int main() {
 
 }
