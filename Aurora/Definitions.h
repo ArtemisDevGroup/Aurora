@@ -29,8 +29,6 @@
 #define AURORA_EXPORT __declspec(dllexport)
 #define AURORA_IMPORT __declspec(dllimport)
 
-#define AURORA_CALL __cdecl
-
 #ifdef _AURORA_EXPORT
 #define AURORA_API AURORA_EXPORT
 #else

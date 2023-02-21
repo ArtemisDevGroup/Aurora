@@ -26,24 +26,26 @@
 // String.cpp: Fix everything.
 //------------------------
 
-#define DEFINE_ENUM_FLAGS(EnumName, EnumType, ...) \
-struct EnumName {\
-private:\
-	typedef EnumType EnumSize;\
-	EnumSize nValue;\
-public:\
-	enum Enum : EnumSize { __VA_ARGS__ };\
-	constexpr EnumName##() noexcept : nValue(0) {}\
-	constexpr EnumName##(_In_ EnumSize nValue) noexcept : nValue(nValue) {}\
-	constexpr EnumName##(_In_ Enum nValue) noexcept : nValue((EnumSize)nValue) {}\
-	constexpr operator Enum() const noexcept { return (Enum)nValue; }\
-}
+template<class Enum, typename EnumSize>
+struct IEnumFlags {
+private:
+	EnumSize nValue;
 
-DEFINE_ENUM_FLAGS( TestFlags, int,
-	Test1,
-	Test2
-);
+public:
+	constexpr IEnumFlags() noexcept : nValue(0) {}
+	constexpr IEnumFlags(_In_ EnumSize nValue) noexcept : nValue(nValue) {}
+	constexpr IEnumFlags(_In_ Enum nValue) noexcept : nValue((EnumSize)nValue) {}
+	constexpr operator Enum() const noexcept { return (Enum)nValue; }
+};
+
+enum class MyEnum : int {
+	Test1
+};
+
+#define DEFINE_FLAGS(EnumClass, EnumSize) struct EnumClass ## Flags : IEnumFlags<EnumClass, EnumSize> { using enum EnumClass; }
+
+DEFINE_FLAGS(MyEnum, int);
 
 int main() {
-
+	
 }
