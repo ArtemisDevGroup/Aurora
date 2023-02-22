@@ -10,7 +10,6 @@
 // Color.h:	Implement HEX.
 // Console.h: Add more functions.
 // Definitions.h: Global.
-// Enumerations.h: Global.
 // Events.h: Global.
 // Exceptions.h: Global.
 // Identification.h: Global.

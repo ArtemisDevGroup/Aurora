@@ -5,7 +5,6 @@
 #include <stdlib.h>
 
 #include "Definitions.h"
-#include "Enumerations.h"
 #include "Interfaces.h"
 #include "Exceptions.h"
 

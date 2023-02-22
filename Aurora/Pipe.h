@@ -27,14 +27,19 @@ namespace Aurora {
 		ClientMode_AcceptRemote = PIPE_ACCEPT_REMOTE_CLIENTS,
 		ClientMode_RejectRemote = PIPE_REJECT_REMOTE_CLIENTS,
 
-		Byte = WriteMode_Byte | ReadMode_Byte,
-		Message = WriteMode_Message | ReadMode_Message
+		Byte = WriteMode_Byte | ReadMode_Byte | WaitMode_Wait | ClientMode_AcceptRemote,
+		Message = WriteMode_Message | ReadMode_Message | WaitMode_Wait | ClientMode_AcceptRemote
 	};
 
 	struct PipeModeFlags : EnumFlags<PipeMode, A_DWORD> { using EnumFlags::EnumFlags; using enum PipeMode; };
 
 	class NamedPipeServer : public IDisposable {
 		A_CHAR szName[MAX_PATH];
+		PipeOpenMode dwOpenMode;
+		PipeModeFlags dwPipeMode;
+		A_DWORD dwMaxInstances;
+		SECURITY_ATTRIBUTES SecurityAttributes;
+		A_BOOL bSecurityAttributesActive;
 		HANDLE hPipe;
 
 	public:
@@ -99,12 +104,7 @@ namespace Aurora {
 
 		NamedPipeServer(const NamedPipeServer&) = delete;
 
-		virtual A_VOID IDisposable::Release() {
-			if (hPipe) {
-				CloseHandle(hPipe);
-				hPipe = nullptr;
-			}
-		}
+		virtual A_VOID IDisposable::Release();
 
 		~NamedPipeServer() { Release(); }
 	};

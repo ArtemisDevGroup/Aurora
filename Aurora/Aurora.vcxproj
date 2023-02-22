@@ -37,6 +37,7 @@
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="Exceptions.cpp" />
     <ClCompile Include="Identification.cpp" />
+    <ClCompile Include="Pipe.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
