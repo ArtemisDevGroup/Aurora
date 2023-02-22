@@ -24,7 +24,6 @@
     <ClInclude Include="Color.h" />
     <ClInclude Include="Console.h" />
     <ClInclude Include="Definitions.h" />
-    <ClInclude Include="Enumerations.h" />
     <ClInclude Include="Events.h" />
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="Identification.h" />

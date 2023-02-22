@@ -26,26 +26,10 @@
 // String.cpp: Fix everything.
 //------------------------
 
-template<class Enum, typename EnumSize>
-struct IEnumFlags {
-private:
-	EnumSize nValue;
+#include <Windows.h>
 
-public:
-	constexpr IEnumFlags() noexcept : nValue(0) {}
-	constexpr IEnumFlags(_In_ EnumSize nValue) noexcept : nValue(nValue) {}
-	constexpr IEnumFlags(_In_ Enum nValue) noexcept : nValue((EnumSize)nValue) {}
-	constexpr operator Enum() const noexcept { return (Enum)nValue; }
-};
-
-enum class MyEnum : int {
-	Test1
-};
-
-#define DEFINE_FLAGS(EnumClass, EnumSize) struct EnumClass ## Flags : IEnumFlags<EnumClass, EnumSize> { using enum EnumClass; }
-
-DEFINE_FLAGS(MyEnum, int);
+#include <Aurora/Thread.h>
 
 int main() {
-	
+
 }

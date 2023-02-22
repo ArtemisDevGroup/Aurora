@@ -33,9 +33,20 @@ namespace Aurora {
 		virtual A_VOID Release() = 0;
 	};
 
-	class IRegisterable {
+	class Registerable {
 	public:
 		A_DWORD dwRegisteredCount;
+	};
+
+	template<class Enum, typename EnumSize>
+	struct EnumFlags {
+		EnumSize nValue;
+
+		constexpr EnumFlags() noexcept : nValue(0) {}
+		constexpr EnumFlags(_In_ EnumSize nValue) noexcept : nValue(nValue) {}
+		constexpr EnumFlags(_In_ Enum nValue) noexcept : nValue((EnumSize)nValue) {}
+
+		constexpr operator Enum() const noexcept { return (Enum)nValue; }
 	};
 }
 

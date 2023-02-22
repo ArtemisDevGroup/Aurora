@@ -4,11 +4,22 @@
 #include "Definitions.h"
 #include "Interfaces.h"
 #include "Exceptions.h"
-#include "Enumerations.h"
 
 #include <Windows.h>
 
 namespace Aurora {
+	enum class ExitCode : A_DWORD {
+		Success = 0,
+		UnknownError = (A_DWORD)(-1),
+		Terminated = (A_DWORD)(-2)
+	};
+
+	enum class WaitResult : A_DWORD {
+		Succeeded = 0,
+		Abandoned = 0x80,
+		TimedOut = 258
+	};
+
 	template<typename ArgumentType = void>
 	class Thread : public IDisposable {
 	public:
@@ -17,6 +28,8 @@ namespace Aurora {
 	private:
 		HANDLE hThread;
 		A_DWORD dwThreadId;
+		SECURITY_ATTRIBUTES SecurityAttributes;
+		A_BOOL bSecurityAttributesActive;
 
 		struct StaticThreadArgs {
 			ThreadFunction lpfnThread;
@@ -26,8 +39,13 @@ namespace Aurora {
 		static A_DWORD __stdcall StaticThread(_In_ StaticThreadArgs* pArgs) { return (A_DWORD)pArgs->lpfnThread(pArgs->Args); }
 
 	public:
-		Thread(_In_ ThreadFunction lpfnThread) noexcept : hThread(nullptr), dwThreadId(0) {
+		Thread(_In_ ThreadFunction lpfnThread, _In_opt_ LPSECURITY_ATTRIBUTES lpSecurityAttributes = nullptr) noexcept : hThread(nullptr), dwThreadId(0) {
 			ArgStruct.lpfnThread = lpfnThread;
+			if (lpSecurityAttributes) {
+				memcpy(&SecurityAttributes, lpSecurityAttributes, sizeof(SECURITY_ATTRIBUTES));
+				bSecurityAttributesActive = true;
+			}
+			else bSecurityAttributesActive = false;
 		}
 
 		A_VOID Start(_In_ ArgumentType Args) {
@@ -36,7 +54,7 @@ namespace Aurora {
 			ArgStruct.Args = Args;
 
 			hThread = CreateThread(
-				nullptr,
+				bSecurityAttributesActive ? &SecurityAttributes : nullptr,
 				0,
 				(LPTHREAD_START_ROUTINE)StaticThread,
 				&ArgStruct,
@@ -84,6 +102,7 @@ namespace Aurora {
 
 			Thread<ArgumentType>* pDst = (Thread<ArgumentType>*)pDestination;
 			pDst->ArgStruct = ArgStruct;
+			pDst->SecurityAttributes = SecurityAttributes;
 
 			if (!DuplicateHandle(
 				GetCurrentProcess(),
@@ -120,10 +139,19 @@ namespace Aurora {
 		HANDLE hThread;
 		A_DWORD dwThreadId;
 
+		SECURITY_ATTRIBUTES SecurityAttributes;
+		A_BOOL bSecurityAttributesActive;
+
 		static A_DWORD __stdcall StaticThread(_In_ ThreadFunction lpfnThread) { return (A_DWORD)lpfnThread(); }
 
 	public:
-		Thread(_In_ ThreadFunction lpfnThread) noexcept : lpfnThread(lpfnThread), hThread(nullptr), dwThreadId(0) {}
+		Thread(_In_ ThreadFunction lpfnThread, _In_opt_ LPSECURITY_ATTRIBUTES lpSecurityAttributes = nullptr) noexcept : lpfnThread(lpfnThread), hThread(nullptr), dwThreadId(0) {
+			if (lpSecurityAttributes) {
+				memcpy(&SecurityAttributes, lpSecurityAttributes, sizeof(SECURITY_ATTRIBUTES));
+				bSecurityAttributesActive = true;
+			}
+			else bSecurityAttributesActive = false;
+		}
 
 		A_VOID Start() {
 			AuroraContextStart();
@@ -177,6 +205,7 @@ namespace Aurora {
 
 			Thread<>* pDst = (Thread<>*)pDestination;
 			pDst->lpfnThread = lpfnThread;
+			pDst->SecurityAttributes = SecurityAttributes;
 
 			if (!DuplicateHandle(
 				GetCurrentProcess(),

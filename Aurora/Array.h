@@ -10,6 +10,28 @@
 #include "Exceptions.h"
 
 namespace Aurora {
+	/// <summary>
+	/// <para>Represents a result after the comparison of two values.</para>
+	/// <para>This is used as a return value for the compare routine of the collection classes.</para>
+	/// <para>See guides or the API reference for usage examples.</para>
+	/// </summary>
+	enum class CompareResult : A_I32 {
+		/// <summary>
+			/// Element 1 is less than element 2.
+			/// </summary>
+		LessThan = -1,
+
+		/// <summary>
+		/// Element 1 and element 2 are equal.
+		/// </summary>
+		Equal = 0,
+
+		/// <summary>
+		/// Element 1 is more than element 2.
+		/// </summary>
+		MoreThan = 1
+	};
+
 	template<typename Type1, typename Type2>
 	class Pair {
 		Type1 Field1;

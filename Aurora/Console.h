@@ -5,9 +5,62 @@
 #include "Interfaces.h"
 #include "Exceptions.h"
 #include "Color.h"
-#include "Enumerations.h"
 
 namespace Aurora {
+	/// <summary>
+	/// Represents a standard data stream.
+	/// </summary>
+	enum class StandardStream {
+		Out,	// The stdout stream.
+		In		// The stdin stream.
+	};
+
+	/// <summary>
+	/// A set of constants representing a color from the 16-color console standard.
+	/// </summary>
+	enum class ConsoleColorLegacy : A_WORD {
+		Black = 0x0000,
+
+		DarkRed = 0x0004,
+		DarkGreen = 0x0002,
+		DarkBlue = 0x0001,
+		DarkGray = 0x0008,
+
+		DarkCyan = DarkBlue | DarkGreen,
+		DarkMagenta = DarkRed | DarkBlue,
+		DarkYellow = DarkRed | DarkGreen,
+
+		Gray = DarkRed | DarkGreen | DarkBlue,
+		Red = DarkRed | DarkGray,
+		Green = DarkGreen | DarkGray,
+		Blue = DarkBlue | DarkGray,
+
+		Cyan = DarkCyan | DarkGray,
+		Magenta = DarkMagenta | DarkGray,
+		Yellow = DarkYellow | DarkGray,
+		White = DarkRed | DarkGreen | DarkBlue | DarkGray
+	};
+
+	/// <summary>
+	/// A set of flags representing a color from the 16-color console standard.
+	/// </summary>
+	struct ConsoleColorLegacyFlags : EnumFlags<ConsoleColorLegacy, A_WORD> {
+		using EnumFlags::EnumFlags;
+		using enum ConsoleColorLegacy;
+
+		/// <summary>
+		/// Gets a WORD representation of the color assigned to this instance to pass to SetConsoleTextAttribute to set the foreground.
+		/// </summary>
+		/// <returns>A WORD representing the foreground color.</returns>
+		constexpr A_WORD GetForegroundLiteral() const noexcept { return nValue; }
+
+		/// <summary>
+		/// Gets a WORD representation of the color assigned to this instace to pass to SetConsoleTextAttribute to set the background.
+		/// </summary>
+		/// <returns>A WORD representing the background color.</returns>
+		constexpr A_WORD GetBackgroundLiteral() const noexcept { return nValue << 4; }
+	};
+
 	/// <summary>
 	/// Creates a console window if the process does not already have one open.
 	/// </summary>
