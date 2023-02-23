@@ -52,8 +52,8 @@ namespace Aurora {
 		);
 
 		A_VOID Create();
-		A_VOID Connect();
-		A_VOID Disconnect();
+		A_VOID Connect() const;
+		A_VOID Disconnect() const;
 
 		A_VOID Read(
 			_Out_writes_bytes_(dwNumberOfBytesToRead) A_LPVOID lpBuffer,
@@ -100,12 +100,15 @@ namespace Aurora {
 			AuroraContextEnd();
 		}
 
-		virtual A_VOID IDisposable::Clone(_Out_ A_LPVOID lpDestination) const { /* Set context and throw NotImplementedException */ }
-
+		/// <summary>
+		/// This function is disabled for this class. Always throws NotImplementedException.
+		/// </summary>
+		/// <param name="">This functions parameters are reserved.</param>
+		/// <exception cref="NotImplementedException"/>
+		virtual A_VOID IDisposable::Clone(_Reserved_ A_LPVOID) const;
 		NamedPipeServer(const NamedPipeServer&) = delete;
 
 		virtual A_VOID IDisposable::Release();
-
 		~NamedPipeServer() { Release(); }
 	};
 

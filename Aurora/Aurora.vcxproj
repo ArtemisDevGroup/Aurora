@@ -28,6 +28,7 @@
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="Identification.h" />
     <ClInclude Include="Interfaces.h" />
+    <ClInclude Include="Memory.h" />
     <ClInclude Include="Pipe.h" />
     <ClInclude Include="Thread.h" />
     <ClInclude Include="Vector.h" />
@@ -37,7 +38,11 @@
     <ClCompile Include="Console.cpp" />
     <ClCompile Include="Exceptions.cpp" />
     <ClCompile Include="Identification.cpp" />
+    <ClCompile Include="Memory.cpp" />
     <ClCompile Include="Pipe.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
