@@ -23,8 +23,17 @@ namespace Aurora {
 	using Pointer = Pointer32;
 #endif // _WIN64
 
-	A_VOID AURORA_API Read();
-	A_VOID AURORA_API Read_s();
+	A_VOID AURORA_API Read(
+		_In_ A_ADDR uAddress,
+		_Out_writes_bytes_(dwSize) A_LPVOID lpBuffer,
+		_In_ A_DWORD dwSize
+	);
+
+	A_VOID AURORA_API Read_s(
+		_In_ A_ADDR uAddress,
+		_Out_writes_bytes_(dwSize) A_LPVOID lpBuffer,
+		_In_ A_DWORD dwSize
+	);
 }
 
 #endif // !__AURORA_MEMORY_H__

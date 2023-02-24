@@ -27,8 +27,23 @@
 
 #include <Windows.h>
 
-#include <Aurora/Thread.h>
+class MyException {};
+
+void ThrowsCPPException() { throw MyException(); }
+void SEHExceptionFramed() {
+	__try {
+		char c = *(char*)0;
+	}
+	__except (GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION ? EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH) {
+		printf("Exception got caught in SEH block.");
+	}
+}
 
 int main() {
-
+	try {
+		SEHExceptionFramed();
+	}
+	catch (MyException&) {
+		printf("Exception got caught in C++ try-catch.");
+	}
 }

@@ -12,6 +12,7 @@ namespace Aurora {
 		AURORA_API const Identifier ParameterInvalidExceptionId = Identifier::Create("ParameterInvalidException", sizeof(ParameterInvalidException));
 		AURORA_API const Identifier ErrnoExceptionId = Identifier::Create("ErrnoException", sizeof(ErrnoException));
 		AURORA_API const Identifier IndexOutOfBoundsExceptionId = Identifier::Create("IndexOutOfBoundsException", sizeof(IndexOutOfBoundsException));
+		AURORA_API const Identifier NotImplementedExceptionId = Identifier::Create("NotImplementedException", sizeof(NotImplementedException));
 	}
 	//------------------------------------------------------------------------>
 	// GlobalExceptionContext
@@ -161,4 +162,7 @@ namespace Aurora {
 	constexpr _Check_return_ A_I32 IndexOutOfBoundsException::GetIndex() const noexcept { return nIndex; }
 	//-----------------------------------
 	constexpr _Check_return_ A_I32 IndexOutOfBoundsException::GetHighestValidIndex() const noexcept { return nMaxValidIndex; }
+	//------------------------------------------------------------------------>
+	// NotImplementedException
+	NotImplementedException::NotImplementedException() : IException("This feature has not yet been implemented", Identifiers::NotImplementedExceptionId) {}
 }

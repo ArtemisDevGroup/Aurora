@@ -25,7 +25,8 @@ namespace Aurora {
 		AURORA_API extern const Identifier WindowsApiExceptionId;
 		AURORA_API extern const Identifier ParameterInvalidExceptionId;
 		AURORA_API extern const Identifier ErrnoExceptionId;
-		AURORA_API extern const Identifier IndexOutOfBoundsExceptionid;
+		AURORA_API extern const Identifier IndexOutOfBoundsExceptionId;
+		AURORA_API extern const Identifier NotImplementedExceptionId;
 	}
 
 	typedef const A_CHAR(*FunctionsArray)[MAX_NAME];
@@ -129,6 +130,15 @@ namespace Aurora {
 		IndexOutOfBoundsException(_In_ A_I32 nIndex, _In_ A_I32 nHighestValidIndex);
 		constexpr _Check_return_ A_I32 GetIndex() const noexcept;
 		constexpr _Check_return_ A_I32 GetHighestValidIndex() const noexcept;
+	};
+
+	class AURORA_API NotImplementedException : public IException, public IExceptionContext<NotImplementedException> { public: NotImplementedException(); };
+
+	class AURORA_API PointerChainInvalidException : public IException, public IExceptionContext<PointerChainInvalidException> {
+		A_I32 nChainLevel;
+
+	public:
+		PointerChainInvalidException(_In_ A_I32 nChainLevel);
 	};
 }
 
