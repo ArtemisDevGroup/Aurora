@@ -26,6 +26,8 @@
 
 #endif // !_AURORA_EXCLUDE_SAL
 
+// ---------- Import / Export macros ----------
+
 #define AURORA_EXPORT __declspec(dllexport)
 #define AURORA_IMPORT __declspec(dllimport)
 
@@ -34,6 +36,8 @@
 #else
 #define AURORA_API AURORA_IMPORT
 #endif
+
+// ---------- Predefined constants ----------
 
 #ifndef MAX_PATH
 // The maximum number of characters in a valid file path.
@@ -55,14 +59,19 @@
 #define MAX_INVOKE 64
 #endif // !MAX_INVOKE
 
-#define INVALID_INDEX (-1) // An invalid index.
+// The value of an invalid index.
+#define INVALID_INDEX (-1)
 
+// ---------- Generic and no-return types ----------
+
+// A void. Used to indicate a function not having a return value, Eg: 'void foo();'. Also used to indicate that a function does not have any parameters (in legacy C), Eg: 'int foo(void);'
 #define A_VOID void
-
 // A void pointer. Generally used as an out pointer of a generic type. Is prefixed as 'lp'.
 typedef A_VOID* A_LPVOID;
 // A constant void pointer. Generally used as an in pointer of a generic type. Is prefixed as 'lp'.
 typedef const A_VOID* A_LPCVOID;
+
+// ---------- Character and string types ----------
 
 // An ANSI character, prefixed as 'c'.
 typedef char A_CHAR;
@@ -82,12 +91,16 @@ typedef wchar_t* A_LPWSTR;
 // A UTF-16LE character pointer. Used for wide strings and is prefixed as 'lp'.
 typedef const wchar_t* A_LPCWSTR;
 
+// ---------- Boolean types ----------
+
 // A boolean, prefixed as 'b'.
 typedef bool A_BOOL;
 // A boolean pointer, prefixed as 'lp'.
 typedef bool* A_LPBOOL;
 // A constant boolean pointer, prefixed as 'lp'.
 typedef const bool* A_LPCBOOL;
+
+// ---------- Signed integral types ----------
 
 // An 8-bit signed integer, prefixed as 'n'.
 typedef signed __int8 A_I8;
@@ -116,6 +129,8 @@ typedef const A_I32* A_LPCI32;
 // A constant 64-bit signed integer pointer, prefixed as 'lp'.
 typedef const A_I64* A_LPCI64;
 
+// ---------- Unsigned integral types ----------
+
 // An 8-bit unsigned integer, prefixed as 'u'.
 typedef unsigned __int8 A_U8;
 // A 16-bit unsigned integer, prefixed as 'u'.
@@ -142,6 +157,8 @@ typedef const A_U16* A_LPCU16;
 typedef const A_U32* A_LPCU32;
 // A constant 64-bit unsigned integer pointer, prefixed as 'lp'.
 typedef const A_U64* A_LPCU64;
+
+// ---------- BYTE, WORD, DWORD and QWORD types ----------
 
 // An 8-bit unsigned integer, prefixed as 'u'.
 typedef unsigned char A_BYTE;
@@ -170,6 +187,8 @@ typedef const A_DWORD* A_LPCDWORD;
 // A constant 64-bit unsigned integer pointer, prefixed as 'lp'.
 typedef const A_QWORD* A_LPCQWORD;
 
+// ---------- Floating point types ----------
+
 // A 32-bit floating point, prefixed as 'f'.
 typedef float A_FL32;
 // A 64-bit floating point, prefixed as 'f'.
@@ -184,5 +203,38 @@ typedef A_FL64* A_LPFL64;
 typedef const A_FL32* A_LPCFL32;
 // A constant 64-bit floating point pointer, prefixed as 'lp'.
 typedef const A_FL64* A_LPCFL64;
+
+// ---------- Integral address types ----------
+
+// An integral representation of an address pointing to a virtual memory location in a 32-bit process. Prefixed as 'u'.
+typedef unsigned __int32 A_ADDR32;
+// An integral representation of an address pointing to a virtual memory location in a 64-bit process. Prefixed as 'u'.
+typedef unsigned __int64 A_ADDR64;
+
+// A pointer to an integral representation of an address pointing to a virtual memory location in a 32-bit process. Prefixed as 'lp'.
+typedef A_ADDR32* A_LPADDR32;
+// A pointer to an integral representation of an address pointing to a virtual memory location in a 64-bit process. Prefixed as 'lp'.
+typedef A_ADDR64* A_LPADDR64;
+
+// A constant pointer to an integral representation of an address pointing to a virtual memory location in a 32-bit process. Prefixed as 'lp'.
+typedef const A_ADDR32* A_LPCADDR32;
+// A constant pointer to an integral representation of an address pointing to a virtual memory location in a 64-bit process. Prefixed as 'lp'.
+typedef const A_ADDR64* A_LPCADDR64;
+
+#ifdef _WIN64
+// An integral representation of an address pointing to a virtual memory location in a 64-bit process. Prefixed as 'u'.
+typedef A_ADDR64 A_ADDR;
+// A pointer to an integral representation of an address pointing to a virtual memory location in a 64-bit process. Prefixed as 'lp'.
+typedef A_ADDR64* A_LPADDR;
+// A constant pointer to an integral representation of an address pointing to a virtual memory location in a 64-bit process. Prefixed as 'lp'.
+typedef const A_ADDR64* A_LPCADDR;
+#else
+// An integral representation of an address pointing to a virtual memory location in a 32-bit process. Prefixed as 'u'.
+typedef A_ADDR32 A_ADDR;
+// A pointer to an integral representation of an address pointing to a virtual memory location in a 32-bit process. Prefixed as 'lp'.
+typedef A_ADDR32* A_LPADDR;
+// A constant pointer to an integral representation of an address pointing to a virtual memory location in a 32-bit process. Prefixed as 'lp'.
+typedef const A_ADDR32* A_LPCADDR;
+#endif // _WIN64
 
 #endif // !__AURORA_DEFINITIONS_H__

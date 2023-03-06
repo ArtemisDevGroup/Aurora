@@ -8,11 +8,6 @@
 #undef RGB
 
 namespace Aurora {
-	enum class ColorRepresentation {
-		Percent,
-		Integral
-	};
-
 	class AURORA_API RGBA;
 	class AURORA_API HSL;
 	class AURORA_API HEX;
@@ -23,7 +18,6 @@ namespace Aurora {
 
 		RGB();
 		RGB(_In_ A_U8 uR, _In_ A_U8 uG, _In_ A_U8 uB);
-		RGB(_In_ const Vector3<>& v3Values, _In_ ColorRepresentation nRepresentation);
 
 		A_VOID ToString(_Out_writes_z_(dwSize) A_LPSTR lpString, _In_ A_DWORD dwSize) const;
 		RGBA ToRGBA() const;
@@ -37,7 +31,6 @@ namespace Aurora {
 
 		RGBA();
 		RGBA(_In_ A_U8 uR, _In_ A_U8 uG, _In_ A_U8 uB, _In_ A_U8 uA);
-		RGBA(_In_ const Vector4<>& v4Values, _In_ ColorRepresentation nRepresentation);
 
 		A_VOID ToString(_Out_writes_z_(dwSize) A_LPSTR lpString, _In_ A_DWORD dwSize) const;
 		RGB ToRGB() const;
@@ -60,7 +53,16 @@ namespace Aurora {
 	};
 	
 	class AURORA_API HEX {
-		
+	public:
+		A_U8 uR, uG, uB, uA;
+
+		HEX();
+		HEX(_In_z_ A_LPCSTR lpHexString);
+
+		A_VOID ToString(_Out_writes_z_(dwSize) A_LPSTR lpString, _In_ A_DWORD dwSize) const;
+		RGB ToRGB() const;
+		RGBA ToRGBA() const;
+		HSL ToHSL() const;
 	};
 
 	namespace Colors {

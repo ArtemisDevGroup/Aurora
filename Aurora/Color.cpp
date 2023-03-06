@@ -155,24 +155,6 @@ namespace Aurora {
 
 	RGB::RGB(_In_ A_U8 uR, _In_ A_U8 uG, _In_ A_U8 uB) : uR(uR), uG(uG), uB(uB) {}
 
-	RGB::RGB(_In_ const Vector3<>& v3Values, _In_ ColorRepresentation nRepresentation) {
-		if (nRepresentation == ColorRepresentation::Integral) {
-			uR = static_cast<A_U8>(v3Values.X());
-			uG = static_cast<A_U8>(v3Values.Y());
-			uB = static_cast<A_U8>(v3Values.Z());
-		}
-		else if (nRepresentation == ColorRepresentation::Percent) {
-			uR = static_cast<A_U8>(v3Values.X() * ('\0' - 1));
-			uG = static_cast<A_U8>(v3Values.Y() * ('\0' - 1));
-			uB = static_cast<A_U8>(v3Values.Z() * ('\0' - 1));
-		}
-		else {
-			uR = 0;
-			uG = 0;
-			uB = 0;
-		}
-	}
-
 	A_VOID RGB::ToString(_Out_writes_z_(dwSize) A_LPSTR lpString, _In_ A_DWORD dwSize) const {
 		sprintf_s(lpString, dwSize, "rgb(%hhu, %hhu, %hhu)", uR, uG, uB);
 	}
@@ -196,11 +178,17 @@ namespace Aurora {
 		return HSL(static_cast<A_U16>(fB > fG ? (360.0f - fHue) : fHue), fSaturation, fLightness);
 	}
 
-	HEX RGB::ToHex() const { return HEX(); }
+	HEX RGB::ToHex() const {
+		HEX hex;
+		hex.uR = uR;
+		hex.uG = uG;
+		hex.uB = uB;
+		hex.uA = 0;
+		return hex;
+	}
 
 	RGBA::RGBA() : uR(0), uG(0), uB(0), uA(0) { }
 	RGBA::RGBA(_In_ A_U8 uR, _In_ A_U8 uG, _In_ A_U8 uB, _In_ A_U8 uA) : uR(uR), uG(uG), uB(uB), uA(uA) {}
-	RGBA::RGBA(_In_ const Vector4<>& v4Values, _In_ ColorRepresentation nRepresentation) { }
 
 	A_VOID RGBA::ToString(_Out_writes_z_(dwSize) A_LPSTR lpString, _In_ A_DWORD dwSize) const {
 		sprintf_s(lpString, dwSize, "rgba(%hhu, %hhu, %hhu, %hhu)", uR, uG, uB, uA);
@@ -214,7 +202,14 @@ namespace Aurora {
 		return hsl;
 	}
 
-	HEX RGBA::ToHex() const { return HEX(); }
+	HEX RGBA::ToHex() const {
+		HEX hex;
+		hex.uR = uR;
+		hex.uG = uG;
+		hex.uB = uB;
+		hex.uA = uA;
+		return hex;
+	}
 
 	HSL::HSL() : uHue(0), fSaturation(0.0f), fLightness(0.0f), fAlpha(0.0f) {}
 	HSL::HSL(_In_ A_U16 uHue, _In_ A_FL32 fSaturation, _In_ A_FL32 fLightness, _In_ A_FL32 fAlpha) : uHue(uHue), fSaturation(fSaturation), fLightness(fLightness), fAlpha(fAlpha) {}
@@ -274,5 +269,53 @@ namespace Aurora {
 		return RGBA(rgb.uR, rgb.uG,	rgb.uR, static_cast<A_U8>(fAlpha * 255.f));
 	}
 
-	HEX HSL::ToHex() const { return HEX(); }
+	HEX HSL::ToHex() const {
+		return this->ToRGBA().ToHex();
+	}
+
+	HEX::HEX() : uR(0), uG(0), uB(0), uA(0) {}
+
+	HEX::HEX(_In_z_ A_LPCSTR lpHexString) : uR(0), uG(0), uB(0), uA(255) {
+		if (lpHexString[0] != '#') return;
+
+		A_LPU8 szColors[] = { &uR, &uG, &uB };
+		size_t uLen = strlen(lpHexString);
+
+		switch (uLen) {
+		case 4:
+			for (A_I32 i = 1; i < 4; i++) {
+				A_CHAR szBuffer[3] = { '\0', '\0', '\0' };
+				szBuffer[0] = lpHexString[i];
+				szBuffer[1] = lpHexString[i];
+
+				sscanf_s(szBuffer, "%hhx", szColors[i - 1]);
+			}
+			break;
+		case 9:
+			_snscanf_s(lpHexString + 7, 2, "%hhx", &uA);
+		case 7:
+			_snscanf_s(lpHexString + 1, 2, "%hhx", &uR);
+			_snscanf_s(lpHexString + 3, 2, "%hhx", &uG);
+			_snscanf_s(lpHexString + 5, 2, "%hhx", &uB);
+			break;
+		default:
+			uA = 0;
+			return;
+		}
+	}
+
+	A_VOID HEX::ToString(_Out_writes_z_(dwSize) A_LPSTR lpString, _In_ A_DWORD dwSize) const {
+		if (!(uR % 0x11) && !(uG % 0x11) && !(uB % 0x11) && (uA == 0xFF || !(uA % 0x11))) {
+			if (uA == 0xFF) sprintf_s(lpString, dwSize, "#%hhX%hhX%hhX", uR / 0x11, uG / 0x11, uB / 0x11);
+			else sprintf_s(lpString, dwSize, "#%hhX%hhX%hhX%hhX", uR / 0x11, uG / 0x11, uB / 0x11, uA / 0x11);
+		}
+		else {
+			if (uA == 0xFF) sprintf_s(lpString, dwSize, "#%hhX%hhX%hhX", uR, uG, uB);
+			else sprintf_s(lpString, dwSize, "#%hhX%hhX%hhX%hhX", uR, uG, uB, uA);
+		}
+	}
+
+	RGB HEX::ToRGB() const { return RGB(uR, uG, uB); }
+	RGBA HEX::ToRGBA() const { return RGBA(uR, uG, uB, uA); }
+	HSL HEX::ToHSL() const { return RGBA(uR, uG, uB, uA).ToHSL(); }
 }

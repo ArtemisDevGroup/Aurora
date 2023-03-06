@@ -142,8 +142,75 @@ namespace Aurora {
 		virtual A_VOID INamedPipeBase::Create();
 	};
 
-	class AnonymousPipe {
+	class AnonymousPipe : public IDisposable {
+		HANDLE hReadPipe;
+		HANDLE hWritePipe;
+		SIZE_T nSize;
+		SECURITY_ATTRIBUTES SecurityAttributes;
+		A_BOOL bSecurityAttributesActive;
 
+	public:
+		AnonymousPipe(
+			_In_opt_ LPSECURITY_ATTRIBUTES lpSecurityAttributes = nullptr,
+			_In_ SIZE_T nSize = 256
+		);
+
+		A_VOID Create();
+
+		A_VOID Read(
+			_Out_writes_bytes_(dwNumberOfBytesToRead) A_LPVOID lpBuffer,
+			_In_ A_DWORD dwNumberOfBytesToRead,
+			_Out_opt_ A_LPDWORD lpNumberOfBytesRead = nullptr
+		);
+
+		A_VOID Read(
+			_Out_writes_z_(dwSize) A_LPSTR lpString,
+			_In_ A_DWORD dwSize
+		);
+
+		template<typename T>
+		A_VOID Read(_Out_ T* lpBuffer) {
+			AuroraContextStart();
+
+			Read(
+				(A_LPVOID)lpBuffer,
+				sizeof(T),
+				nullptr
+			);
+
+			AuroraContextEnd();
+		}
+
+		A_VOID Write(
+			_In_reads_bytes_(dwNumberOfBytesToWrite) A_LPCVOID lpBuffer,
+			_In_ A_DWORD dwNumberOfBytesToWrite,
+			_Out_opt_ A_LPDWORD lpNumberOfBytesWritten = nullptr
+		);
+
+		A_VOID Write(_In_z_ A_LPCSTR lpString);
+
+		template<typename T>
+		A_VOID Write(_In_ const T* lpBuffer) {
+			AuroraContextStart();
+
+			Write(
+				(A_LPCVOID)lpBuffer,
+				sizeof(T),
+				nullptr
+			);
+
+			AuroraContextEnd();
+		}
+
+		/// <summary>
+		/// This function is disabled for this class. Always throws NotImplementedException.
+		/// </summary>
+		/// <param name="">This functions parameters are reserved.</param>
+		/// <exception cref="NotImplementedException"/>
+		virtual A_VOID IDisposable::Clone(_Reserved_ A_LPVOID) const;
+		virtual A_VOID IDisposable::Release();
+
+		~AnonymousPipe();
 	};
 }
 

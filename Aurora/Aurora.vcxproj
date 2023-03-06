@@ -30,6 +30,7 @@
     <ClInclude Include="Interfaces.h" />
     <ClInclude Include="Memory.h" />
     <ClInclude Include="Pipe.h" />
+    <ClInclude Include="ProcessInfo.h" />
     <ClInclude Include="Thread.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>
@@ -40,6 +41,7 @@
     <ClCompile Include="Identification.cpp" />
     <ClCompile Include="Memory.cpp" />
     <ClCompile Include="Pipe.cpp" />
+    <ClCompile Include="ProcessInfo.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

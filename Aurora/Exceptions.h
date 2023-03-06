@@ -27,6 +27,12 @@ namespace Aurora {
 		AURORA_API extern const Identifier ErrnoExceptionId;
 		AURORA_API extern const Identifier IndexOutOfBoundsExceptionId;
 		AURORA_API extern const Identifier NotImplementedExceptionId;
+		AURORA_API extern const Identifier PointerChainInvalidExceptionId;
+		AURORA_API extern const Identifier Read32ExceptionId;
+		AURORA_API extern const Identifier Read64ExceptionId;
+		AURORA_API extern const Identifier Write32ExceptionId;
+		AURORA_API extern const Identifier Write64ExceptionId;
+		AURORA_API extern const Identifier ObjectNotFoundExceptionId;
 	}
 
 	typedef const A_CHAR(*FunctionsArray)[MAX_NAME];
@@ -35,7 +41,6 @@ namespace Aurora {
 	public:
 		GlobalExceptionContext() = delete;
 		GlobalExceptionContext(const GlobalExceptionContext&) = delete;
-		~GlobalExceptionContext() = delete;
 
 		static _Check_return_ A_DWORD SetContext(_In_z_ A_LPCSTR lpContext);
 		static _Check_return_ _Ret_maybenull_ FunctionsArray GetContext() noexcept;
@@ -62,6 +67,18 @@ namespace Aurora {
 		A_BOOL operator!=(_In_z_ A_LPCSTR) const;
 	};
 
+	typedef A_VOID(__cdecl* ThrowEventHandler)(_In_ IException* lpException, _In_opt_ A_LPVOID lpParameter);
+
+	class AURORA_API NextThrowEventManager {
+	public:
+		NextThrowEventManager() = delete;
+		NextThrowEventManager(const NextThrowEventManager&) = delete;
+
+		static A_I32 QueueEvent(_In_ ThrowEventHandler lpfnHandler, _In_opt_ A_LPVOID lpParameter = nullptr);
+		static A_VOID Invoke(_In_ IException* lpException);
+		static A_VOID ClearEventQueue(_In_ A_I32 nIndex = INVALID_INDEX);
+	};
+
 	template<class Derived>
 	class IExceptionContext {
 		A_CHAR lpszFunctions[MAX_CALL_TRACE][MAX_NAME];
@@ -76,12 +93,18 @@ namespace Aurora {
 		inline Derived WithContext(_In_z_ A_LPCSTR lpFunction, _In_z_ A_LPCSTR lpFile, _In_ A_I32 nLine) {
 			nFunctionCount = GlobalExceptionContext::GetContextCount();
 			for (A_I32 i = 0; i < nFunctionCount; i++)
+#pragma warning(push)
+#pragma warning(disable:6011) // "Dereferencing NULL pointer 'GetContext()'." warning disabled due to 'GetContext()' not returning NULL as long as 'GetContextCount()' > 0.
 				strcpy_s(lpszFunctions[i], GlobalExceptionContext::GetContext()[i]);
+#pragma warning(pop)
 			GlobalExceptionContext::ResetContext(GetCurrentThreadId());
 
 			strcpy_s(szCoreFunction, lpFunction);
 			strcpy_s(szFilePath, lpFile);
 			this->nLine = nLine;
+
+			NextThrowEventManager::Invoke((Derived*)this);
+
 			return *(Derived*)this;
 		}
 
@@ -139,6 +162,44 @@ namespace Aurora {
 
 	public:
 		PointerChainInvalidException(_In_ A_I32 nChainLevel);
+
+		constexpr A_I32 GetChainLevel() const noexcept;
+	};
+
+	template<typename AddressType>
+	class AURORA_API IMemoryExceptionBase : public IException, public IExceptionContext<IMemoryExceptionBase<AddressType>> {
+		AddressType uAddress;
+		A_DWORD dwSize;
+
+	public:
+		IMemoryExceptionBase(_In_z_ A_LPCSTR lpMessage, const Identifier& Id, _In_ AddressType uAddress, _In_ A_DWORD dwSize) : IException(lpMessage, Id), uAddress(uAddress), dwSize(dwSize) {}
+
+		constexpr AddressType GetAddress() const noexcept { return uAddress; }
+		constexpr A_DWORD GetSize() const noexcept { return dwSize; }
+	};
+
+	class AURORA_API Read32Exception : public IMemoryExceptionBase<A_ADDR32> { public: Read32Exception(_In_ A_ADDR32 uAddress, _In_ A_DWORD dwSize); };
+	class AURORA_API Read64Exception : public IMemoryExceptionBase<A_ADDR64> { public: Read64Exception(_In_ A_ADDR64 uAddress, _In_ A_DWORD dwSize); };
+	class AURORA_API Write32Exception : public IMemoryExceptionBase<A_ADDR32> { public: Write32Exception(_In_ A_ADDR32 uAddress, _In_ A_DWORD dwSize); };
+	class AURORA_API Write64Exception : public IMemoryExceptionBase<A_ADDR64> { public: Write64Exception(_In_ A_ADDR64 uAddress, _In_ A_DWORD dwSize); };
+
+#ifdef _WIN64
+	using ReadException = Read64Exception;
+	using WriteException = Write64Exception;
+#else
+	using ReadException = Read32Exception;
+	using WriteException = Write32Exception;
+#endif
+
+	class AURORA_API ObjectNotFoundException : public IException, public IExceptionContext<ObjectNotFoundException> {
+		A_CHAR szObjectType[MAX_NAME];
+		A_CHAR szObjectName[MAX_NAME];
+
+	public:
+		ObjectNotFoundException(_In_z_ A_LPCSTR lpObjectType, _In_z_ A_LPCSTR lpObjectName);
+
+		constexpr _Check_return_ _Ret_z_ A_LPCSTR GetObjectType() const noexcept;
+		constexpr _Check_return_ _Ret_z_ A_LPCSTR GetObjectName() const noexcept;
 	};
 }
 

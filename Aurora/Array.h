@@ -136,7 +136,10 @@ namespace Aurora {
 				pArray = new ElementType[nAllocCount];
 				nMaxCount = nAllocCount;
 
+#pragma warning(push)
+#pragma warning(disable:6386) // Disabling "buffer overrun" warning due to pArray never being overran, it gets checked at line 128.
 				for (A_I32 i = 0; i < this->nCount; i++) pArray[i] = pOldArray[i];
+#pragma warning(pop)
 			}
 			else {
 				pArray = new ElementType[nAllocCount];

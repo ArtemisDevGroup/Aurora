@@ -5,3 +5,4 @@
 #define A_VOID
 #define AuroraThrow(Exception, __VA_ARGS__) throw Exception(__VA_ARGS__).WithContext(__FUNCSIG__, __FILE__, __LINE__)
 #define AuroraContextEnd() Aurora::GlobalExceptionContext::ResetContext(dwKey)
+#define AURORA_API
