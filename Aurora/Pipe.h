@@ -33,7 +33,7 @@ namespace Aurora {
 
 	struct PipeModeFlags : EnumFlags<PipeMode, A_DWORD> { using EnumFlags::EnumFlags; using enum PipeMode; };
 
-	class INamedPipeBase : public IDisposable {
+	class AURORA_API INamedPipeBase : public IDisposable {
 		HANDLE* phPipe;
 	public:
 		INamedPipeBase(_In_ LPHANDLE lpPipeHandle);
@@ -97,7 +97,7 @@ namespace Aurora {
 		~INamedPipeBase();
 	};
 
-	class NamedPipeServer : public INamedPipeBase {
+	class AURORA_API NamedPipeServer : public INamedPipeBase {
 		A_CHAR szName[MAX_PATH];
 		PipeOpenMode dwOpenMode;
 		PipeModeFlags dwPipeMode;
@@ -123,7 +123,7 @@ namespace Aurora {
 		A_VOID Disconnect() const;
 	};
 
-	class NamedPipeClient : public INamedPipeBase {
+	class AURORA_API NamedPipeClient : public INamedPipeBase {
 		A_CHAR szName[MAX_PATH];
 		PipeOpenMode dwOpenMode;
 		SECURITY_ATTRIBUTES SecurityAttributes;
@@ -142,7 +142,7 @@ namespace Aurora {
 		virtual A_VOID INamedPipeBase::Create();
 	};
 
-	class AnonymousPipe : public IDisposable {
+	class AURORA_API AnonymousPipe : public IDisposable {
 		HANDLE hReadPipe;
 		HANDLE hWritePipe;
 		SIZE_T nSize;
