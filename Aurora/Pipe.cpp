@@ -12,6 +12,8 @@ namespace Aurora {
 	) {
 		AuroraContextStart();
 
+		if (!lpBuffer) AuroraThrow(ParameterInvalidException, "lpBuffer");
+
 		if (!ReadFile(
 			*phPipe,
 			lpBuffer,
@@ -28,6 +30,8 @@ namespace Aurora {
 		_In_ A_DWORD dwSize
 	) {
 		AuroraContextStart();
+
+		if (!lpString) AuroraThrow(ParameterInvalidException, "lpString");
 
 		A_LPSTR lpBuffer = new A_CHAR[dwSize];
 		A_DWORD dwNumberOfBytesRead;
@@ -63,6 +67,8 @@ namespace Aurora {
 	) {
 		AuroraContextStart();
 
+		if (!lpBuffer) AuroraThrow(ParameterInvalidException, "lpBuffer");
+
 		if (!WriteFile(
 			*phPipe,
 			lpBuffer,
@@ -76,6 +82,8 @@ namespace Aurora {
 
 	A_VOID INamedPipeBase::Write(_In_z_ A_LPCSTR lpString) {
 		AuroraContextStart();
+
+		if (!lpString) AuroraThrow(ParameterInvalidException, "lpString");
 
 		if (!WriteFile(
 			*phPipe,
@@ -111,7 +119,7 @@ namespace Aurora {
 		_In_opt_ LPSECURITY_ATTRIBUTES lpSecurityAttributes
 	) : INamedPipeBase(&hPipe), dwOpenMode(dwOpenMode), dwPipeMode(dwPipeMode), dwMaxInstances(dwMaxInstances), hPipe(nullptr), SecurityAttributes({ 0 }) {
 		if (!strncmp(lpName, "\\\\.\\pipe\\", 9)) strcpy_s(szName, lpName);
-		else sprintf_s(szName, "\\\\.\\%s", lpName);
+		else sprintf_s(szName, "\\\\.\\pipe\\%s", lpName);
 
 		if (lpSecurityAttributes) {
 			memcpy(&SecurityAttributes, lpSecurityAttributes, sizeof(SECURITY_ATTRIBUTES));
@@ -156,7 +164,7 @@ namespace Aurora {
 		_In_ PipeOpenMode dwOpenMode,
 		_In_opt_ LPSECURITY_ATTRIBUTES lpSecurityAttributes
 	) : INamedPipeBase(&hPipe), dwOpenMode(dwOpenMode), SecurityAttributes({ 0 }) {
-		if (lpName[0] == '\\' && lpName[1] == '\\' && lpName[2] == '.' && lpName[3] == '\\') strcpy_s(szName, lpName);
+		if (!strncmp(lpName, "\\\\.\\pipe\\", 9)) strcpy_s(szName, lpName);
 		else sprintf_s(szName, "\\\\.\\pipe\\%s", lpName);
 
 		if (lpSecurityAttributes) {
@@ -231,6 +239,8 @@ namespace Aurora {
 	) {
 		AuroraContextStart();
 
+		if (!lpBuffer) AuroraThrow(ParameterInvalidException, "lpBuffer");
+
 		if (!ReadFile(
 			hReadPipe,
 			lpBuffer,
@@ -247,6 +257,8 @@ namespace Aurora {
 		_In_ A_DWORD dwSize
 	) {
 		AuroraContextStart();
+
+		if (!lpString) AuroraThrow(ParameterInvalidException, "lpString");
 
 		A_LPSTR lpBuffer = new A_CHAR[dwSize];
 		A_DWORD dwNumberOfBytesRead;
@@ -282,6 +294,8 @@ namespace Aurora {
 	) {
 		AuroraContextStart();
 
+		if (!lpBuffer) AuroraThrow(ParameterInvalidException, "lpBuffer");
+
 		if (!WriteFile(
 			hWritePipe,
 			lpBuffer,
@@ -295,6 +309,8 @@ namespace Aurora {
 
 	A_VOID AnonymousPipe::Write(_In_z_ A_LPCSTR lpString) {
 		AuroraContextStart();
+
+		if (!lpString) AuroraThrow(ParameterInvalidException, "lpString");
 
 		if (!WriteFile(
 			hWritePipe,

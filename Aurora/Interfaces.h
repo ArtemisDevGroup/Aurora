@@ -5,7 +5,7 @@
 
 namespace Aurora {
 	template<typename ElementType>
-	class IIterable {
+	class AURORA_API IIterable {
 		ElementType** ppArray;
 		A_LPI32 lpArraySize;
 		A_LPI32 lpCurrentSize;
@@ -22,7 +22,7 @@ namespace Aurora {
 		constexpr const ElementType* end() const { return &(*ppArray)[size()]; }
 	};
 
-	class IDisposable {
+	class AURORA_API IDisposable {
 	public:
 		/// <summary>
 		/// Clones the disposable data of the class and creates a new instance.
@@ -33,13 +33,13 @@ namespace Aurora {
 		virtual A_VOID Release() = 0;
 	};
 
-	class Registerable {
+	class AURORA_API Registerable {
 	public:
 		A_DWORD dwRegisteredCount;
 	};
 
 	template<class Enum, typename EnumSize>
-	struct EnumFlags {
+	struct AURORA_API EnumFlags {
 		EnumSize nValue;
 
 		constexpr EnumFlags() noexcept : nValue(0) {}
