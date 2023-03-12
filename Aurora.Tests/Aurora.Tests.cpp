@@ -17,40 +17,15 @@
 
 #include <Aurora/Pipe.h>
 #include <Aurora/Binary.h>
+#include <Aurora/Memory.h>
 
 using namespace Aurora;
 
-template<typename T>
-concept NonVoid = !std::is_same<T, void>::value;
-
-template<typename T>
-concept IsArithmetic = requires(T a) {
-	{ a + a };
-	{ a - a };
-	{ a * a };
-	{ a / a };
-};
-
-template<typename T>
-concept IsComparable = requires(T a) {
-	{ a > a } -> std::convertible_to<bool>;
-	{ a >= a } -> std::convertible_to<bool>;
-	{ a < a } -> std::convertible_to<bool>;
-	{ a <= a } -> std::convertible_to<bool>;
-	{ a == a } -> std::convertible_to<bool>;
-	{ a != a } -> std::convertible_to<bool>;
-};
-
-class IComparable {
-public:
-	virtual bool operator<(IComparable&) const = 0;
-	virtual bool operator<=(IComparable&) const = 0;
-	virtual bool operator>(IComparable&) const = 0;
-	virtual bool operator>=(IComparable&) const = 0;
-	virtual bool operator!=(IComparable&) const = 0;
-	virtual bool operator==(IComparable&) const = 0;
-};
-
 int main() {
+	ProcessInfo* lpProcInfo = ProcessInfo::Create();
 
+	BasePointer<A_I32> pt(0x99, { 10, 20, 30, 40, 50 });
+	WritePtr(lpProcInfo->GetModule(), pt, 10);
+
+	lpProcInfo->Release();
 }

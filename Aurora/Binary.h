@@ -4,7 +4,31 @@
 #include "Definitions.h"
 
 namespace Aurora {
-	template<typename BufferType>
+	template<typename T>
+	concept ArithmeticType = requires(T a) {
+		{ a + a };
+		{ a - a };
+		{ a * a };
+		{ a / a };
+		{ a % a };
+		{ a ^ a };
+		{ a & a };
+		{ a | a };
+		{ a << a };
+		{ a >> a };
+		{ ~a };
+
+		{ a += a };
+		{ a -= a };
+		{ a *= a };
+		{ a /= a };
+		{ a %= a };
+		{ a ^= a };
+		{ a &= a };
+		{ a |= a };
+	};
+
+	template<ArithmeticType BufferType>
 	class Binary {
 		BufferType Buffer;
 

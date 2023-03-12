@@ -304,7 +304,7 @@ namespace Aurora {
 		/// Gets a pointer to the module with the provided name.
 		/// </summary>
 		/// <param name="lpModuleName">- The name of the module to find.</param>
-		/// <returns>A pointer to a ModuleInfo32 instance containing information about the module.</returns>
+		/// <returns>A pointer to a ModuleInfo64 instance containing information about the module.</returns>
 		/// <exception cref="ObjectNotFoundException"/>
 		ModuleInfo64* GetModule(_In_opt_z_ A_LPCSTR lpModuleName = nullptr) const;
 	};

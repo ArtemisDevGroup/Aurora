@@ -4,7 +4,7 @@
 
 namespace Aurora {
 	A_VOID AURORA_API UnsafeRead(
-		_In_range_(1,MAXLONGLONG) A_ADDR uAddress,
+		_In_Address_ A_ADDR uAddress,
 		_Out_writes_bytes_(dwSize) A_LPVOID lpBuffer,
 		_In_ A_DWORD dwSize
 	) {
@@ -20,7 +20,7 @@ namespace Aurora {
 	}
 
 	A_BOOL ReadSEHFramed(
-		_In_range_(1, MAXLONGLONG) A_ADDR uAddress,
+		_In_Address_ A_ADDR uAddress,
 		_Out_writes_bytes_(dwSize) A_LPVOID lpBuffer,
 		_In_ A_DWORD dwSize
 	) {
@@ -35,7 +35,7 @@ namespace Aurora {
 	}
 
 	A_VOID AURORA_API Read(
-		_In_range_(1, MAXLONGLONG) A_ADDR uAddress,
+		_In_Address_ A_ADDR uAddress,
 		_Out_writes_bytes_(dwSize) A_LPVOID lpBuffer,
 		_In_ A_DWORD dwSize
 	) {
@@ -45,7 +45,7 @@ namespace Aurora {
 	}
 
 	A_VOID AURORA_API ReadStringA(
-		_In_ A_ADDR uAddress,
+		_In_Address_ A_ADDR uAddress,
 		_Out_writes_z_(dwCount) A_LPSTR lpBuffer,
 		_In_ A_DWORD dwCount,
 		_Out_opt_ A_LPDWORD lpNumberOfCharactersRead
@@ -73,7 +73,7 @@ namespace Aurora {
 	}
 
 	A_VOID AURORA_API ReadStringW(
-		_In_ A_ADDR uAddress,
+		_In_Address_ A_ADDR uAddress,
 		_Out_writes_z_(dwCount) A_LPWSTR lpBuffer,
 		_In_ A_DWORD dwCount,
 		_Out_opt_ A_LPDWORD lpNumberOfCharactersRead
@@ -101,7 +101,7 @@ namespace Aurora {
 	}
 
 	A_VOID AURORA_API UnsafeWrite(
-		_In_range_(1, MAXLONGLONG) A_ADDR uAddress,
+		_In_Address_ A_ADDR uAddress,
 		_In_reads_bytes_(dwSize) A_LPCVOID lpBuffer,
 		_In_ A_DWORD dwSize
 	) {
@@ -117,7 +117,7 @@ namespace Aurora {
 	}
 
 	A_BOOL WriteSEHFramed(
-		_In_range_(1, MAXLONGLONG) A_ADDR uAddress,
+		_In_Address_ A_ADDR uAddress,
 		_In_reads_bytes_(dwSize) A_LPCVOID lpBuffer,
 		_In_ A_DWORD dwSize
 	) {
@@ -132,12 +132,32 @@ namespace Aurora {
 	}
 
 	A_VOID AURORA_API Write(
-		_In_range_(1, MAXLONGLONG) A_ADDR uAddress,
+		_In_Address_ A_ADDR uAddress,
 		_In_reads_bytes_(dwSize) A_LPCVOID lpBuffer,
 		_In_ A_DWORD dwSize
 	) {
 		AuroraContextStart();
 		if (!WriteSEHFramed(uAddress, lpBuffer, dwSize)) AuroraThrow(WriteException, uAddress, dwSize);
+		AuroraContextEnd();
+	}
+
+	A_VOID AURORA_API WriteStringA(
+		_In_Address_ A_ADDR uAddress,
+		_In_z_ A_LPCSTR lpBuffer
+	) {
+		AuroraContextStart();
+		if (!lpBuffer) AuroraThrow(ParameterInvalidException, "lpBuffer");
+		Write(uAddress, lpBuffer, lstrlenA(lpBuffer) + 1);
+		AuroraContextEnd();
+	}
+
+	A_VOID AURORA_API WriteStringW(
+		_In_Address_ A_ADDR uAddress,
+		_In_z_ A_LPCWSTR lpBuffer
+	) {
+		AuroraContextStart();
+		if (!lpBuffer) AuroraThrow(ParameterInvalidException, "lpBuffer");
+		Write(uAddress, lpBuffer, (lstrlenW(lpBuffer) + 1) * 2);
 		AuroraContextEnd();
 	}
 }

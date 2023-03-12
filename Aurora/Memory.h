@@ -34,6 +34,8 @@ namespace Aurora {
 	class BasePointer32 : public Pointer32<ReturnType> {
 		A_DWORD dwBaseOffset;
 	public:
+		inline BasePointer32() noexcept : Pointer32<ReturnType>(), dwBaseOffset(0) {}
+
 		/// <summary>
 		/// Constructs a base pointer.
 		/// </summary>
@@ -56,6 +58,8 @@ namespace Aurora {
 	class BasePointer64 : public Pointer64<ReturnType> {
 		A_DWORD dwBaseOffset;
 	public:
+		inline BasePointer64() noexcept : Pointer64<ReturnType>(), dwBaseOffset(0) {}
+
 		/// <summary>
 		/// Constructs a base pointer.
 		/// </summary>
@@ -104,7 +108,7 @@ namespace Aurora {
 	/// <param name="dwSize">- The number of bytes to read.</param>
 	/// <exception cref="ParameterInvalidException"/>
 	A_VOID AURORA_API UnsafeRead(
-		_In_range_(1, MAXLONGLONG) A_ADDR uAddress,
+		_In_Address_ A_ADDR uAddress,
 		_Out_writes_bytes_(dwSize) A_LPVOID lpBuffer,
 		_In_ A_DWORD dwSize
 	);
@@ -118,7 +122,7 @@ namespace Aurora {
 	/// <exception cref="ParameterInvalidException"/>
 	/// <exception cref="ReadException"/>
 	template<ReadReturnType ReturnType>
-	inline ReturnType UnsafeRead(_In_ A_ADDR uAddress) {
+	inline ReturnType UnsafeRead(_In_Address_ A_ADDR uAddress) {
 		AuroraContextStart();
 
 		ReturnType ret = ReturnType();
@@ -138,15 +142,13 @@ namespace Aurora {
 	/// <exception cref="ReadException"/>
 	template<ReadReturnType ReturnType, A_I32 nSize>
 	inline A_VOID UnsafeRead(
-		_In_ A_ADDR uAddress,
+		_In_Address_ A_ADDR uAddress,
 		_Out_writes_(nSize) ReturnType(&lpBuffer)[nSize]
 	) {
 		AuroraContextStart();
 		UnsafeRead(uAddress, (A_LPVOID)lpBuffer, nSize * sizeof(ReturnType));
 		AuroraContextEnd();
 	}
-
-
 
 	/// <summary>
 	/// Reads memory from an address into a buffer.
@@ -157,7 +159,7 @@ namespace Aurora {
 	/// <exception cref="ParameterInvalidException"/>
 	/// <exception cref="ReadException"/>
 	A_VOID AURORA_API Read(
-		_In_range_(1, MAXLONGLONG) A_ADDR uAddress,
+		_In_Address_ A_ADDR uAddress,
 		_Out_writes_bytes_(dwSize) A_LPVOID lpBuffer,
 		_In_ A_DWORD dwSize
 	);
@@ -171,7 +173,7 @@ namespace Aurora {
 	/// <exception cref="ParameterInvalidException"/>
 	/// <exception cref="ReadException"/>
 	template<ReadReturnType ReturnType>
-	inline ReturnType Read(_In_ A_ADDR uAddress) {
+	inline ReturnType Read(_In_Address_ A_ADDR uAddress) {
 		AuroraContextStart();
 		
 		ReturnType ret = ReturnType();
@@ -182,7 +184,7 @@ namespace Aurora {
 	}
 
 	/// <summary>
-	/// Reads memory from an address and returns it.
+	/// Reads memory from an address.
 	/// </summary>
 	/// <typeparam name="ReturnType">- The type to read.</typeparam>
 	/// <param name="uAddress">- The address to read memory from.</param>
@@ -191,15 +193,13 @@ namespace Aurora {
 	/// <exception cref="ReadException"/>
 	template<ReadReturnType ReturnType, A_I32 nSize>
 	inline A_VOID Read(
-		_In_ A_ADDR uAddress,
+		_In_Address_ A_ADDR uAddress,
 		_Out_writes_(nSize) ReturnType(&lpBuffer)[nSize]
 	) {
 		AuroraContextStart();
 		Read(uAddress, (A_LPVOID)lpBuffer, nSize * sizeof(ReturnType));
 		AuroraContextEnd();
 	}
-
-
 
 	/// <summary>
 	/// Reads the address at the end of a pointer chain and returns it.
@@ -212,7 +212,7 @@ namespace Aurora {
 	/// <exception cref="ReadException"/>
 	template<typename PointerType>
 	inline A_ADDR ReadPtrAddress(
-		_In_ A_ADDR uBaseAddress,
+		_In_Address_ A_ADDR uBaseAddress,
 		_In_ const Pointer<PointerType>& refPointer
 	) {
 		AuroraContextStart();
@@ -240,6 +240,8 @@ namespace Aurora {
 	) {
 		AuroraContextStart();
 
+		if (!lpModuleInfo) AuroraThrow(ParameterInvalidException, "lpModuleInfo");
+
 		A_ADDR uAddress = lpModuleInfo->GetModuleBaseAddress() + refPointer.GetOffset();
 
 		for (A_ADDR uOffset : refPointer)
@@ -249,36 +251,86 @@ namespace Aurora {
 		return uAddress;
 	}
 
+	// ReadPtr definitions dealing with standard pointers and requiring explicit specification of return type.
 
-
+	/// <summary>
+	/// Reads memory from the end of a pointer chain and returns it.
+	/// </summary>
+	/// <typeparam name="ReturnType">- The type to read.</typeparam>
+	/// <typeparam name="PointerType">- The type specified by the pointer.</typeparam>
+	/// <param name="uBaseAddress">- The base address of the pointer.</param>
+	/// <param name="refPointer">- A reference to the pointer.</param>
+	/// <returns>The read data.</returns>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="ReadException"/>
 	template<ReadReturnType ReturnType, typename PointerType>
 	inline ReturnType ReadPtr(
-		_In_ A_ADDR uBaseAddress,
+		_In_Address_ A_ADDR uBaseAddress,
 		_In_ const Pointer<PointerType>& refPointer
 	) {
 		AuroraContextStart();
-
-		uBaseAddress = ReadPtrAddress<PointerType>(uBaseAddress, refPointer);
-		ReturnType retValue = Read<ReturnType>(uBaseAddress);
-
+		ReturnType retValue = Read<ReturnType>(ReadPtrAddress<PointerType>(uBaseAddress, refPointer));
 		AuroraContextEnd();
 		return retValue;
 	}
 
-	template<ReadReturnType ReturnType>
-	inline ReturnType ReadPtr(
+	/// <summary>
+	/// Reads memory from the end of a pointer.
+	/// </summary>
+	/// <typeparam name="ReturnType">- The type to read.</typeparam>
+	/// <typeparam name="PointerType">- The type specified by the pointer.</typeparam>
+	/// <typeparam name="nSize">- The number of elements in the array.</typeparam>
+	/// <param name="uBaseAddress">- The base address of the pointer.</param>
+	/// <param name="refPointer">- A reference to the pointer.</param>
+	/// <param name="lpBuffer">- A reference to a buffer to receive the read data.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="ReadException"/>
+	template<ReadReturnType ReturnType, typename PointerType, A_I32 nSize>
+	inline A_VOID ReadPtr(
 		_In_ A_ADDR uBaseAddress,
-		_In_ const Pointer<ReturnType>& refPointer
+		_In_ const Pointer<PointerType>& refPointer,
+		_Out_writes_(nSize) ReturnType(&lpBuffer)[nSize]
 	) {
 		AuroraContextStart();
-
-		uBaseAddress = ReadPtrAddress<ReturnType>(uBaseAddress, refPointer);
-		ReturnType retValue = Read<ReturnType>(uBaseAddress);
-
+		Read<ReturnType, nSize>(ReadPtrAddress<PointerType>(uBaseAddress, refPointer), lpBuffer);
 		AuroraContextEnd();
-		return retValue;
 	}
 
+	/// <summary>
+	/// Reads memory from the end of a pointer.
+	/// </summary>
+	/// <typeparam name="ReturnType">- The type to read.</typeparam>
+	/// <typeparam name="PointerType">- The type specified by the pointer.</typeparam>
+	/// <param name="uBaseAddress">- The base address of the pointer.</param>
+	/// <param name="refPointer">- A reference to the pointer.</param>
+	/// <param name="lpBuffer">- A pointer to a buffer to receive the read data.</param>
+	/// <param name="nSize">- The size of the buffer in elements.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="ReadException"/>
+	template<ReadReturnType ReturnType, typename PointerType>
+	inline A_VOID ReadPtr(
+		_In_Address_ A_ADDR uBaseAddress,
+		_In_ const Pointer<PointerType>& refPointer,
+		_Out_writes_(nSize) ReturnType* lpBuffer,
+		_In_ A_I32 nSize
+	) {
+		AuroraContextStart();
+		Read(ReadPtrAddress<PointerType>(uBaseAddress, refPointer), lpBuffer, nSize * sizeof(ReturnType));
+		AuroraContextEnd();
+	}
+
+	// ReadPtr definitions dealing with base pointers and requiring explicit specification of return type.
+
+	/// <summary>
+	/// Reads memory from the end of a pointer chain and returns it.
+	/// </summary>
+	/// <typeparam name="ReturnType">- The type to read.</typeparam>
+	/// <typeparam name="PointerType">- The type specified by the pointer.</typeparam>
+	/// <param name="lpModuleInfo">- A pointer to the module containing the base of the pointer.</param>
+	/// <param name="refPointer">- A reference to the base pointer.</param>
+	/// <returns>The read data.</returns>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="ReadException"/>
 	template<ReadReturnType ReturnType, typename PointerType>
 	inline ReturnType ReadPtr(
 		_In_ const ModuleInfo* lpModuleInfo,
@@ -286,13 +338,143 @@ namespace Aurora {
 	) {
 		AuroraContextStart();
 
-		A_ADDR uAddress = ReadPtrAddress<PointerType>(lpModuleInfo, refPointer);
-		ReturnType retValue = Read<ReturnType>(uAddress);
+		if (!lpModuleInfo) AuroraThrow(ParameterInvalidException, "lpModuleInfo");
+
+		ReturnType retValue = Read<ReturnType>(ReadPtrAddress<PointerType>(lpModuleInfo, refPointer));
 
 		AuroraContextEnd();
 		return retValue;
 	}
 
+	/// <summary>
+	/// Reads memory from the end of a pointer chain.
+	/// </summary>
+	/// <typeparam name="ReturnType">- The type to read.</typeparam>
+	/// <typeparam name="PointerType">- The type specified by the pointer.</typeparam>
+	/// <typeparam name="nSize">- The number of elements in the array.</typeparam>
+	/// <param name="lpModuleInfo">- A pointer to the module containing the base of the pointer.</param>
+	/// <param name="refPointer">- A reference to the base pointer.</param>
+	/// <param name="lpBuffer">- A reference to a buffer to receive the read data.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="ReadException"/>
+	template<ReadReturnType ReturnType, typename PointerType, A_I32 nSize>
+	inline A_VOID ReadPtr(
+		_In_ const ModuleInfo* lpModuleInfo,
+		_In_ const BasePointer<PointerType>& refPointer,
+		_Out_writes_(nSize) ReturnType(&lpBuffer)[nSize]
+	) {
+		AuroraContextStart();
+
+		if (!lpModuleInfo) AuroraThrow(ParameterInvalidException, "lpModuleInfo");
+
+		Read<ReturnType, nSize>(ReadPtrAddress<PointerType>(lpModuleInfo, refPointer), lpBuffer);
+
+		AuroraContextEnd();
+	}
+
+	/// <summary>
+	/// Reads memory from the end of a pointer chain.
+	/// </summary>
+	/// <typeparam name="ReturnType">- The type to read.</typeparam>
+	/// <typeparam name="PointerType">- The type specified by the pointer.</typeparam>
+	/// <param name="lpModuleInfo">- A pointer to the module containing the base of the pointer.</param>
+	/// <param name="refPointer">- A reference to the base pointer.</param>
+	/// <param name="lpBuffer">- A pointer to a buffer to receive the read data.</param>
+	/// <param name="nSize">- The size of the buffer in elements.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="ReadException"/>
+	template<ReadReturnType ReturnType, typename PointerType>
+	inline A_VOID ReadPtr(
+		_In_ const ModuleInfo* lpModuleInfo,
+		_In_ const BasePointer<PointerType>& refPointer,
+		_Out_writes_(nSize) ReturnType* lpBuffer,
+		_In_ A_I32 nSize
+	) {
+		AuroraContextStart();
+
+		if (!lpModuleInfo) AuroraThrow(ParameterInvalidException, "lpModuleInfo");
+
+		Read(ReadPtrAddress<PointerType>(lpModuleInfo, refPointer), lpBuffer, nSize * sizeof(ReturnType));
+
+		AuroraContextEnd();
+	}
+
+	// ReadPtr definitions dealing with standard pointers and inheriting the return type of the pointer.
+
+	/// <summary>
+	/// Reads data from the end of a pointer and returns it.
+	/// </summary>
+	/// <typeparam name="ReturnType">- The type to read.</typeparam>
+	/// <param name="uBaseAddress">- The base address of the pointer.</param>
+	/// <param name="refPointer">- A reference to the pointer.</param>
+	/// <returns>The read data.</returns>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="ReadException"/>
+	template<ReadReturnType ReturnType>
+	inline ReturnType ReadPtr(
+		_In_Address_ A_ADDR uBaseAddress,
+		_In_ const Pointer<ReturnType>& refPointer
+	) {
+		AuroraContextStart();
+		ReturnType retValue = Read<ReturnType>(ReadPtrAddress<ReturnType>(uBaseAddress, refPointer));
+		AuroraContextEnd();
+		return retValue;
+	}
+
+	/// <summary>
+	/// Reads memory from the end of a pointer.
+	/// </summary>
+	/// <typeparam name="ReturnType">- The type to read.</typeparam>
+	/// <typeparam name="nSize">- The number of elements in the array.</typeparam>
+	/// <param name="uBaseAddress">- The base address of the pointer.</param>
+	/// <param name="refPointer">- A reference to the pointer.</param>
+	/// <param name="lpBuffer">- A reference to a buffer to receive the read data.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="ReadException"/>
+	template<ReadReturnType ReturnType, A_I32 nSize>
+	inline A_VOID ReadPtr(
+		_In_Address_ A_ADDR uBaseAddress,
+		_In_ const Pointer<ReturnType>& refPointer,
+		_Out_writes_(nSize) ReturnType(&lpBuffer)[nSize]
+	) {
+		AuroraContextStart();
+		Read<ReturnType, nSize>(ReadPtrAddress<ReturnType>(uBaseAddress, refPointer), lpBuffer);
+		AuroraContextEnd();
+	}
+
+	/// <summary>
+	/// Reads memory from the end of a pointer.
+	/// </summary>
+	/// <typeparam name="ReturnType">- The type to read.</typeparam>
+	/// <param name="uBaseAddress">- The base address of the pointer.</param>
+	/// <param name="refPointer">- A reference to the pointer.</param>
+	/// <param name="lpBuffer">- A pointer to a buffer to receive the read data.</param>
+	/// <param name="nSize">- The size of the buffer in elements.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="ReadException"/>
+	template<ReadReturnType ReturnType>
+	inline A_VOID ReadPtr(
+		_In_Address_ A_ADDR uBaseAddress,
+		_In_ const Pointer<ReturnType>& refPointer,
+		_Out_writes_(nSize) ReturnType* lpBuffer,
+		_In_ A_I32 nSize
+	) {
+		AuroraContextStart();
+		Read(ReadPtrAddress<ReturnType>(uBaseAddress, refPointer), lpBuffer, nSize * sizeof(ReturnType));
+		AuroraContextEnd();
+	}
+
+	// ReadPtr definitions dealing with base pointers and inheriting the return type of the pointer.
+
+	/// <summary>
+	/// Reads memory from the end of a pointer chain and returns it.
+	/// </summary>
+	/// <typeparam name="ReturnType">- The type to read.</typeparam>
+	/// <param name="lpModuleInfo">- A pointer to the module containing the base of the pointer.</param>
+	/// <param name="refPointer">- A reference to the base pointer.</param>
+	/// <returns>The read data.</returns>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="ReadException"/>
 	template<ReadReturnType ReturnType>
 	inline ReturnType ReadPtr(
 		_In_ const ModuleInfo* lpModuleInfo,
@@ -300,26 +482,94 @@ namespace Aurora {
 	) {
 		AuroraContextStart();
 
-		A_ADDR uAddress = ReadPtrAddress<ReturnType>(lpModuleInfo, refPointer);
-		ReturnType retValue = Read<ReturnType>(uAddress);
+		if (!lpModuleInfo) AuroraThrow(ParameterInvalidException, "lpModuleInfo");
+
+		ReturnType retValue = Read<ReturnType>(ReadPtrAddress<ReturnType>(lpModuleInfo, refPointer));
 
 		AuroraContextEnd();
 		return retValue;
 	}
 
+	/// <summary>
+	/// Reads memory from the end of a pointer chain.
+	/// </summary>
+	/// <typeparam name="ReturnType">- The type to read.</typeparam>
+	/// <typeparam name="nSize">- The number of elements in the array.</typeparam>
+	/// <param name="lpModuleInfo">- A pointer to the module containing the base of the pointer.</param>
+	/// <param name="refPointer">- A reference to the base pointer.</param>
+	/// <param name="lpBuffer">- A reference to a buffer to receive the read data.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="ReadException"/>
+	template<ReadReturnType ReturnType, A_I32 nSize>
+	inline A_VOID ReadPtr(
+		_In_ const ModuleInfo* lpModuleInfo,
+		_In_ const BasePointer<ReturnType>& refPointer,
+		_Out_writes_(nSize) ReturnType(&lpBuffer)[nSize]
+	) {
+		AuroraContextStart();
 
+		if (!lpModuleInfo) AuroraThrow(ParameterInvalidException, "lpModuleInfo");
 
+		Read<ReturnType, nSize>(ReadPtrAddress<ReturnType>(lpModuleInfo, refPointer), lpBuffer);
+
+		AuroraContextEnd();
+	}
+
+	/// <summary>
+	/// Reads memory from the end of a pointer chain.
+	/// </summary>
+	/// <typeparam name="ReturnType">- The type to read.</typeparam>
+	/// <param name="lpModuleInfo">- A pointer to the module containing the base of the pointer.</param>
+	/// <param name="refPointer">- A reference to the base pointer.</param>
+	/// <param name="lpBuffer">- A pointer to a buffer to receive the read data.</param>
+	/// <param name="nSize">- The size of the buffer in elements.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="ReadException"/>
+	template<ReadReturnType ReturnType>
+	inline A_VOID ReadPtr(
+		_In_ const ModuleInfo* lpModuleInfo,
+		_In_ const BasePointer<ReturnType>& refPointer,
+		_Out_writes_(nSize) ReturnType* lpBuffer,
+		_In_ A_I32 nSize
+	) {
+		AuroraContextStart();
+
+		if (!lpModuleInfo) AuroraThrow(ParameterInvalidException, "lpModuleInfo");
+
+		Read(ReadPtrAddress<ReturnType>(lpModuleInfo, refPointer), lpBuffer, nSize * sizeof(ReturnType));
+
+		AuroraContextEnd();
+	}
+
+	/// <summary>
+	/// Reads an ANSI string from an address.
+	/// </summary>
+	/// <param name="uAddress">- The address to read.</param>
+	/// <param name="lpBuffer">- A pointer to a buffer to receive the read string.</param>
+	/// <param name="dwCount">- The number of characters to read.</param>
+	/// <param name="lpNumberOfCharactersRead">- A pointer to a DWORD to receive the number of characters read. This parameter is optional.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="ReadException"/>
 	A_VOID AURORA_API ReadStringA(
-		_In_ A_ADDR uAddress,
+		_In_Address_ A_ADDR uAddress,
 		_Out_writes_z_(dwCount) A_LPSTR lpBuffer,
 		_In_ A_DWORD dwCount,
 		_Out_opt_ A_LPDWORD lpNumberOfCharactersRead = nullptr
 	);
 
+	/// <summary>
+	/// Reads an ANSI string from an address.
+	/// </summary>
+	/// <typeparam name="nCount">- The size fo the array.</typeparam>
+	/// <param name="uAddress">- The address to read.</param>
+	/// <param name="lpBuffer">- A reference to a buffer to receive the read string.</param>
+	/// <param name="lpNumberOfCharactersRead">- A pointer to a DWORD to receive the number of characters read. This parameter is optional.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="ReadException"/>
 	template<A_I32 nCount>
 	inline A_VOID ReadStringA(
-		_In_ A_ADDR uAddress,
-		_Out_writes_z_(nCount) A_LPSTR lpBuffer,
+		_In_Address_ A_ADDR uAddress,
+		_Out_writes_z_(nCount) A_CHAR(&lpBuffer)[nCount],
 		_Out_opt_ A_LPDWORD lpNumberOfCharactersRead = nullptr
 	) {
 		AuroraContextStart();
@@ -327,27 +577,41 @@ namespace Aurora {
 		AuroraContextEnd();
 	}
 
-
-
+	/// <summary>
+	/// Reads a UTF-16LE string from an address.
+	/// </summary>
+	/// <param name="uAddress">- The address to read.</param>
+	/// <param name="lpBuffer">- A pointer to a buffer to receive the read string.</param>
+	/// <param name="dwCount">- The number of characters to read.</param>
+	/// <param name="lpNumberOfCharactersRead">- A pointer to a DWORD to receive the number of characters read. This parameter is optional.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="ReadException"/>
 	A_VOID AURORA_API ReadStringW(
-		_In_ A_ADDR uAddress,
+		_In_Address_ A_ADDR uAddress,
 		_Out_writes_z_(dwCount) A_LPWSTR lpBuffer,
 		_In_ A_DWORD dwCount,
 		_Out_opt_ A_LPDWORD lpNumberOfCharactersRead = nullptr
 	);
 
+	/// <summary>
+	/// Reads a UTF-16LE string from an address.
+	/// </summary>
+	/// <typeparam name="nCount">- The number of characters in the array.</typeparam>
+	/// <param name="uAddress">- The address to read.</param>
+	/// <param name="lpBuffer">- A reference to a buffer to receive the read string.</param>
+	/// <param name="lpNumberOfCharactersRead">- A pointer to a DWORD to receive the number of characters read. This parameter is optional.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="ReadException"/>
 	template<A_I32 nCount>
 	inline A_VOID ReadStringW(
-		_In_ A_ADDR uAddress,
-		_Out_writes_z_(nSize) A_LPWSTR lpBuffer,
+		_In_Address_ A_ADDR uAddress,
+		_Out_writes_z_(nCount) A_WCHAR(&lpBuffer)[nCount],
 		_Out_opt_ A_LPDWORD lpNumberOfCharactersRead = nullptr
 	) {
 		AuroraContextStart();
 		ReadStringW(uAddress, lpBuffer, nCount, lpNumberOfCharactersRead);
 		AuroraContextEnd();
 	}
-
-
 
 	/// <summary>
 	/// Writes memory to an address from a buffer. This function is unsafe and shall not be used unless speed is mandetory.
@@ -357,7 +621,7 @@ namespace Aurora {
 	/// <param name="dwSize">- The number of bytes to write.</param>
 	/// <exception cref="ParameterInvalidException"/>
 	A_VOID AURORA_API UnsafeWrite(
-		_In_range_(1, MAXLONGLONG) A_ADDR uAddress,
+		_In_Address_ A_ADDR uAddress,
 		_In_reads_bytes_(dwSize) A_LPCVOID lpBuffer,
 		_In_ A_DWORD dwSize
 	);
@@ -370,7 +634,7 @@ namespace Aurora {
 	/// <exception cref="ParameterInvalidException"/>
 	template<WriteDataType DataType>
 	inline A_VOID UnsafeWrite(
-		_In_ A_ADDR uAddress,
+		_In_Address_ A_ADDR uAddress,
 		_In_ const DataType& refData
 	) {
 		AuroraContextStart();
@@ -387,15 +651,13 @@ namespace Aurora {
 	/// <exception cref="WriteException"/>
 	template<WriteDataType DataType, A_I32 nSize>
 	inline A_VOID UnsafeWrite(
-		_In_ A_ADDR uAddress,
+		_In_Address_ A_ADDR uAddress,
 		_In_ const DataType(&lpData)[nSize]
 	) {
 		AuroraContextStart();
 		Write(uAddress, (A_LPCVOID)lpData, nSize * sizeof(DataType));
 		AuroraContextEnd();
 	}
-
-
 
 	/// <summary>
 	/// Writes memory to an address from a buffer.
@@ -406,7 +668,7 @@ namespace Aurora {
 	/// <exception cref="ParameterInvalidException"/>
 	/// <exception cref="WriteException"/>
 	A_VOID AURORA_API Write(
-		_In_range_(1, MAXLONGLONG) A_ADDR uAddress,
+		_In_Address_ A_ADDR uAddress,
 		_In_reads_bytes_(dwSize) A_LPCVOID lpBuffer,
 		_In_ A_DWORD dwSize
 	);
@@ -418,9 +680,8 @@ namespace Aurora {
 	/// <param name="refData">- The data to write.</param>
 	/// <exception cref="ParameterInvalidException"/>
 	/// <exception cref="WriteException"/>
-	template<WriteDataType DataType>
-	inline A_VOID Write(
-		_In_ A_ADDR uAddress,
+	template<WriteDataType DataType> inline A_VOID Write(
+		_In_Address_ A_ADDR uAddress,
 		_In_ const DataType& refData
 	) {
 		AuroraContextStart();
@@ -437,13 +698,301 @@ namespace Aurora {
 	/// <exception cref="WriteException"/>
 	template<WriteDataType DataType, A_I32 nSize>
 	inline A_VOID Write(
-		_In_ A_ADDR uAddress,
+		_In_Address_ A_ADDR uAddress,
 		_In_ const DataType(&lpData)[nSize]
 	) {
 		AuroraContextStart();
 		Write(uAddress, (A_LPCVOID)lpData, nSize * sizeof(DataType));
 		AuroraContextEnd();
 	}
+
+	// WritePtr definitions dealing with standard pointers and requiring explicit specification of data type.
+
+	/// <summary>
+	/// Writes memory to the end of a pointer.
+	/// </summary>
+	/// <typeparam name="DataType">- The type to write.</typeparam>
+	/// <typeparam name="PointerType">- The type specified by the pointer.</typeparam>
+	/// <param name="uBaseAddress">- The base address of the pointer.</param>
+	/// <param name="refPointer">- A reference to the pointer.</param>
+	/// <param name="refData">- A reference to the data to write.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="WriteException"/>
+	template<WriteDataType DataType, typename PointerType>
+	inline A_VOID WritePtr(
+		_In_Address_ A_ADDR uBaseAddress,
+		_In_ const Pointer<PointerType>& refPointer,
+		_In_ const DataType& refData
+	) {
+		AuroraContextStart();
+		Write<DataType>(ReadPtrAddress<PointerType>(uBaseAddress, refPointer), refData);
+		AuroraContextEnd();
+	}
+
+	/// <summary>
+	/// Writes memory to the end of a pointer.
+	/// </summary>
+	/// <typeparam name="DataType">- The type to write.</typeparam>
+	/// <typeparam name="PointerType">- The type specified by the pointer.</typeparam>
+	/// <typeparam name="nSize">- The number of elements in the array.</typeparam>
+	/// <param name="uBaseAddress">- The base address of the pointer.</param>
+	/// <param name="refPointer">- A reference to the pointer.</param>
+	/// <param name="lpData">- A reference to a buffer containing the data to write.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="WriteException"/>
+	template<WriteDataType DataType, typename PointerType, A_I32 nSize>
+	inline A_VOID WritePtr(
+		_In_Address_ A_ADDR uBaseAddress,
+		_In_ const Pointer<PointerType>& refPointer,
+		_In_ const DataType(&lpData)[nSize]
+	) {
+		AuroraContextStart();
+		Write<DataType, nSize>(ReadPtrAddress<PointerType>(uBaseAddress, refPointer), lpData);
+		AuroraContextEnd();
+	}
+
+	/// <summary>
+	/// Writes memory to the end of a pointer.
+	/// </summary>
+	/// <typeparam name="DataType">- The type to write.</typeparam>
+	/// <typeparam name="PointerType">- The type specified by the pointer.</typeparam>
+	/// <param name="uBaseAddress">- The base address of the pointer.</param>
+	/// <param name="refPointer">- A reference to the pointer.</param>
+	/// <param name="lpData">- A pointer to a buffer containing the data to write.</param>
+	/// <param name="nSize">- The size of the buffer in elements.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="WriteException"/>
+	template<WriteDataType DataType, typename PointerType>
+	inline A_VOID WritePtr(
+		_In_Address_ A_ADDR uBaseAddress,
+		_In_ const Pointer<PointerType>& refPointer,
+		_In_ const DataType* lpData,
+		_In_ A_I32 nSize
+	) {
+		AuroraContextStart();
+		Write(ReadPtrAddress<PointerType>(uBaseAddress, refPointer), lpData, nSize * sizeof(DataType));
+		AuroraContextEnd();
+	}
+
+	// WritePtr definitions dealing with base pointers and requiring explicit specification of data type.
+
+	/// <summary>
+	/// Writes memory to the end of a pointer.
+	/// </summary>
+	/// <typeparam name="DataType">- The type to write.</typeparam>
+	/// <typeparam name="PointerType">- The type specified by the pointer.</typeparam>
+	/// <param name="lpModuleInfo">- A pointer to the module containing the base of the pointer.</param>
+	/// <param name="refPointer">- A reference to the base pointer.</param>
+	/// <param name="refData">- A reference to the data to write.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="WriteException"/>
+	template<WriteDataType DataType, typename PointerType>
+	inline A_VOID WritePtr(
+		_In_ const ModuleInfo* lpModuleInfo,
+		_In_ const BasePointer<PointerType>& refPointer,
+		_In_ const DataType& refData
+	) {
+		AuroraContextStart();
+		Write<DataType>(ReadPtrAddress<PointerType>(lpModuleInfo, refPointer), refData);
+		AuroraContextEnd();
+	}
+
+	/// <summary>
+	/// Writes memory to the end of a pointer.
+	/// </summary>
+	/// <typeparam name="DataType">- The type to write.</typeparam>
+	/// <typeparam name="PointerType">- The type specified by the pointer.</typeparam>
+	/// <param name="lpModuleInfo">- A pointer to the module containing the base of the pointer.</param>
+	/// <param name="refPointer">- A reference to the base pointer.</param>
+	/// <param name="lpData">- A reference to a buffer containing the data to write.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="WriteException"/>
+	template<WriteDataType DataType, typename PointerType, A_I32 nSize>
+	inline A_VOID WritePtr(
+		_In_ const ModuleInfo* lpModuleInfo,
+		_In_ const BasePointer<PointerType>& refPointer,
+		_In_ const DataType(&lpData)[nSize]
+	) {
+		AuroraContextStart();
+		Write<DataType, nSize>(ReadPtrAddress<PointerType>(lpModuleInfo, refPointer), lpData);
+		AuroraContextEnd();
+	}
+
+	/// <summary>
+	/// Writes memory to the end of a pointer.
+	/// </summary>
+	/// <typeparam name="DataType">- The type to write.</typeparam>
+	/// <typeparam name="PointerType">- The type specified by the pointer.</typeparam>
+	/// <param name="lpModuleInfo">- A pointer to the module containing the base of the pointer.</param>
+	/// <param name="refPointer">- A reference to the base pointer.</param>
+	/// <param name="lpData">- A pointer to a buffer containing the data to write.</param>
+	/// <param name="nSize">- The size of the buffer in elements.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="WriteException"/>
+	template<WriteDataType DataType, typename PointerType>
+	inline A_VOID WritePtr(
+		_In_ const ModuleInfo* lpModuleInfo,
+		_In_ const BasePointer<PointerType>& refPointer,
+		_In_ const DataType* lpData,
+		_In_ A_I32 nSize
+	) {
+		AuroraContextStart();
+		Write(ReadPtrAddress<PointerType>(lpModuleInfo, refPointer), lpData, nSize * sizeof(DataType));
+		AuroraContextEnd();
+	}
+
+	// WritePtr definitions dealing with standard pointers and inheriting the data type of the pointer.
+
+	/// <summary>
+	/// Writes memory to the end of a pointer.
+	/// </summary>
+	/// <typeparam name="DataType">- The type to write.</typeparam>
+	/// <param name="uBaseAddress">- The base address of the pointer.</param>
+	/// <param name="refPointer">- A reference to the pointer.</param>
+	/// <param name="refData">- A reference to the data to write.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="WriteException"/>
+	template<WriteDataType DataType>
+	inline A_VOID WritePtr(
+		_In_Address_ A_ADDR uBaseAddress,
+		_In_ const Pointer<DataType>& refPointer,
+		_In_ const DataType& refData
+	) {
+		AuroraContextStart();
+		Write<DataType>(ReadPtrAddress<DataType>(uBaseAddress, refPointer), refData);
+		AuroraContextEnd();
+	}
+
+	/// <summary>
+	/// Writes memory to the end of a pointer.
+	/// </summary>
+	/// <typeparam name="DataType">- The type to write.</typeparam>
+	/// <typeparam name="nSize">- The number of elements in the array.</typeparam>
+	/// <param name="uBaseAddress">- The base address of the pointer.</param>
+	/// <param name="refPointer">- A reference to the pointer.</param>
+	/// <param name="lpData">- A reference to a buffer containing the data to write.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="WriteException"/>
+	template<WriteDataType DataType, A_I32 nSize>
+	inline A_VOID WritePtr(
+		_In_Address_ A_ADDR uBaseAddress,
+		_In_ const Pointer<DataType>& refPointer,
+		_In_ const DataType(&lpData)[nSize]
+	) {
+		AuroraContextStart();
+		Write<DataType, nSize>(ReadPtrAddress<DataType>(uBaseAddress, refPointer), lpData);
+		AuroraContextEnd();
+	}
+
+	/// <summary>
+	/// Writes memory to the end of a pointer.
+	/// </summary>
+	/// <typeparam name="DataType">- The type to write.</typeparam>
+	/// <param name="uBaseAddress">- The base address of the pointer.</param>
+	/// <param name="refPointer">- A reference to the pointer.</param>
+	/// <param name="lpData">- A pointer to a buffer containing the data to write.</param>
+	/// <param name="nSize">- The size of the buffer in elements.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="WriteException"/>
+	template<WriteDataType DataType>
+	inline A_VOID WritePtr(
+		_In_Address_ A_ADDR uBaseAddress,
+		_In_ const Pointer<DataType>& refPointer,
+		_In_ const DataType* lpData,
+		_In_ A_I32 nSize
+	) {
+		AuroraContextStart();
+		Write(ReadPtrAddress<DataType>(uBaseAddress, refPointer), lpData, nSize * sizeof(DataType));
+		AuroraContextEnd();
+	}
+
+	// WritePtr definitions dealing with base pointers and inheriting the data type of the pointer.
+
+	/// <summary>
+	/// Writes memory to the end of a pointer.
+	/// </summary>
+	/// <typeparam name="DataType">- The type to write.</typeparam>
+	/// <param name="lpModuleInfo">- A pointer to the module containing the base of the pointer.</param>
+	/// <param name="refPointer">- A reference to the base pointer.</param>
+	/// <param name="refData">- A reference to the data to write.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="WriteException"/>
+	template<WriteDataType DataType>
+	inline A_VOID WritePtr(
+		_In_ const ModuleInfo* lpModuleInfo,
+		_In_ const BasePointer<DataType>& refPointer,
+		_In_ const DataType& refData
+	) {
+		AuroraContextStart();
+		Write<DataType>(ReadPtrAddress<DataType>(lpModuleInfo, refPointer), refData);
+		AuroraContextEnd();
+	}
+
+	/// <summary>
+	/// Writes memory to the end of a pointer.
+	/// </summary>
+	/// <typeparam name="DataType">- The type to write.</typeparam>
+	/// <param name="lpModuleInfo">- A pointer to the module containing the base of the pointer.</param>
+	/// <param name="refPointer">- A reference to the base pointer.</param>
+	/// <param name="lpData">- A reference to a buffer containing the data to write.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="WriteException"/>
+	template<WriteDataType DataType, A_I32 nSize>
+	inline A_VOID WritePtr(
+		_In_ const ModuleInfo* lpModuleInfo,
+		_In_ const BasePointer<DataType>& refPointer,
+		_In_ const DataType(&lpData)[nSize]
+	) {
+		AuroraContextStart();
+		Write<DataType, nSize>(ReadPtrAddress<DataType>(lpModuleInfo, refPointer), lpData);
+		AuroraContextEnd();
+	}
+
+	/// <summary>
+	/// Writes memory to the end of a pointer.
+	/// </summary>
+	/// <typeparam name="DataType">- The type to write.</typeparam>
+	/// <param name="lpModuleInfo">- A pointer to the module containing the base of the pointer.</param>
+	/// <param name="refPointer">- A reference to the base pointer.</param>
+	/// <param name="lpData">- A pointer to a buffer containing the data to write.</param>
+	/// <param name="nSize">- The size of the buffer in elements.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="WriteException"/>
+	template<WriteDataType DataType>
+	inline A_VOID WritePtr(
+		_In_ const ModuleInfo* lpModuleInfo,
+		_In_ const BasePointer<DataType>& refPointer,
+		_In_ const DataType* lpData,
+		_In_ A_I32 nSize
+	) {
+		AuroraContextStart();
+		Write(ReadPtrAddress<DataType>(lpModuleInfo, refPointer), lpData, nSize * sizeof(DataType));
+		AuroraContextEnd();
+	}
+
+	/// <summary>
+	/// Writes an ANSI string to an address.
+	/// </summary>
+	/// <param name="uAddress">- The address to write to.</param>
+	/// <param name="lpBuffer">- A pointer to the string to write.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="WriteException"/>
+	A_VOID AURORA_API WriteStringA(
+		_In_Address_ A_ADDR uAddress,
+		_In_z_ A_LPCSTR lpBuffer
+	);
+
+	/// <summary>
+	/// Writes a UTF-16LE string to an address.
+	/// </summary>
+	/// <param name="uAddress">- The address to write to.</param>
+	/// <param name="lpBuffer">- A pointer to the string to write.</param>
+	/// <exception cref="ParameterInvalidException"/>
+	/// <exception cref="WriteException"/>
+	A_VOID AURORA_API WriteStringW(
+		_In_Address_ A_ADDR uAddress,
+		_In_z_ A_LPCWSTR lpBuffer
+	);
 }
 
 #endif // !__AURORA_MEMORY_H__

@@ -299,7 +299,7 @@ namespace Aurora {
 	};
 
 	template<typename ElementType>
-	class AURORA_API ArgumentList : public IIterable<ElementType>, public IDisposable {
+	class ArgumentList : public IIterable<ElementType>, public IDisposable {
 		ElementType* pArray;
 		int nCount;
 

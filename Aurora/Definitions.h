@@ -37,6 +37,17 @@
 #define AURORA_API AURORA_IMPORT
 #endif
 
+// ---------- SAL annotations ----------
+
+#define _In_Address32_ _In_range_(1, 0xFFFFFFFFU)
+#define _In_Address64_ _In_range_(1, 0xFFFFFFFFFFFFFFFFUi64)
+
+#ifdef _WIN64
+#define _In_Address_ _In_Address64_
+#else
+#define _In_Address_ _In_Address32_
+#endif // _WIN64
+
 // ---------- Predefined constants ----------
 
 #ifndef MAX_PATH
