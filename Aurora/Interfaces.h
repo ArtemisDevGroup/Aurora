@@ -47,6 +47,7 @@ namespace Aurora {
 		constexpr EnumFlags(_In_ Enum nValue) noexcept : nValue((EnumSize)nValue) {}
 
 		constexpr operator Enum() const noexcept { return (Enum)nValue; }
+		constexpr operator EnumSize() const noexcept { return nValue; }
 	};
 }
 

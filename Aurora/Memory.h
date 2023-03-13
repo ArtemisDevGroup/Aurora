@@ -995,4 +995,6 @@ namespace Aurora {
 	);
 }
 
+#include "Memory_Virtual.h"
+
 #endif // !__AURORA_MEMORY_H__

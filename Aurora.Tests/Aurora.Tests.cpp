@@ -22,10 +22,5 @@
 using namespace Aurora;
 
 int main() {
-	ProcessInfo* lpProcInfo = ProcessInfo::Create();
 
-	BasePointer<A_I32> pt(0x99, { 10, 20, 30, 40, 50 });
-	WritePtr(lpProcInfo->GetModule(), pt, 10);
-
-	lpProcInfo->Release();
 }

@@ -29,6 +29,7 @@
     <ClInclude Include="Identification.h" />
     <ClInclude Include="Interfaces.h" />
     <ClInclude Include="Memory.h" />
+    <ClInclude Include="Memory_Virtual.h" />
     <ClInclude Include="Pipe.h" />
     <ClInclude Include="ProcessInfo.h" />
     <ClInclude Include="Thread.h" />
@@ -40,6 +41,7 @@
     <ClCompile Include="Exceptions.cpp" />
     <ClCompile Include="Identification.cpp" />
     <ClCompile Include="Memory.cpp" />
+    <ClCompile Include="Memory_Virtual.cpp" />
     <ClCompile Include="Pipe.cpp" />
     <ClCompile Include="ProcessInfo.cpp" />
   </ItemGroup>
