@@ -3,8 +3,6 @@
 namespace Aurora {
 	AllocationTypeFlags AURORA_API operator|(_In_ AllocationType dwLeft, _In_ AllocationType dwRight) { return AllocationTypeFlags((A_DWORD)dwLeft | (A_DWORD)dwRight); }
 
-	constexpr VirtualAllocation32::VirtualAllocation32() noexcept : uRequestedAddress(0), uRealAddress(0), uSize(0), dwAllocationType(0), dwProtect((MemoryProtection)0), hProcess(nullptr) {}
-
 	constexpr VirtualAllocation32::VirtualAllocation32(
 		_In_opt_ A_ADDR32 uAddress,
 		_In_ A_U64 uSize,

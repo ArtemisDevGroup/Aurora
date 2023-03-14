@@ -52,8 +52,6 @@ namespace Aurora {
 		HANDLE hProcess;
 
 	public:
-		constexpr VirtualAllocation32() noexcept;
-
 		constexpr VirtualAllocation32(
 			_In_opt_ A_ADDR32 uAddress = 0,
 			_In_ A_U64 uSize = 4096,

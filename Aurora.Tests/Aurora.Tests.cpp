@@ -22,5 +22,35 @@
 using namespace Aurora;
 
 int main() {
+	HANDLE hFile = CreateFileA(
+		"C:\\Users\\douglas.lyman\\Desktop\\test.txt",
+		FILE_GENERIC_READ | FILE_GENERIC_WRITE,
+		FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+		nullptr,
+		CREATE_ALWAYS,
+		FILE_ATTRIBUTE_NORMAL,
+		nullptr
+	);
 
+	if (hFile == INVALID_HANDLE_VALUE) {
+		printf("CreateFileA GetLastError: %lu", GetLastError());
+		return -1;
+	}
+
+	LPCSTR lpString = "Test!";
+
+	if (!WriteFile(
+		hFile,
+		lpString,
+		strlen(lpString) + 1,
+		nullptr,
+		nullptr
+	)) {
+		printf("WriteFile GetLastError: %lu", GetLastError());
+		return -1;
+	}
+
+	FlushFileBuffers(hFile);
+
+	CloseHandle(hFile);
 }
